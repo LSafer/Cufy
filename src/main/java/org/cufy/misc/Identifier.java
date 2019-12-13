@@ -10,7 +10,7 @@
  */
 package org.cufy.misc;
 
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.util.function.BiFunction;
 

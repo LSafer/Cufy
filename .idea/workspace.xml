@@ -1,7 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f99d2ad7-521a-4c45-8472-d81704e6fc95" name="Default Changelist" comment="" />
+    <list default="true" id="f99d2ad7-521a-4c45-8472-d81704e6fc95" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/Sulim.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/groovy/cufy/beans/TraitBean.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/groovy/cufy/beans/TraitBean.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/Bean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/beans/Bean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/FullBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/beans/FullBean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/Invoke.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/beans/Invoke.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Castable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Castable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Caster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Caster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Global.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Global.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Loop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Loop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Range.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Range.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/TypedValue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/TypedValue.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Cast.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Cast.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/For.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/For.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Foreach.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Foreach.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Lock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Lock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Parallel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Parallel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/While.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/While.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/text/Format.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/text/Format.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/text/FormatException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/text/FormatException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/text/ParseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/text/ParseException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/misc/Identifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/misc/Identifier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/text/JSON.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/text/JSON.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/text/SERB64.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/text/SERB64.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/HybridMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/util/HybridMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/JetMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/util/JetMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/CasterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cufy/lang/CasterTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,7 +44,11 @@
       <ProjectState />
     </projectState>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1UveQn2OZjUHPyy74FejwSjSN4z" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -21,6 +57,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -29,7 +66,7 @@
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Gradle.Cufy [dependencies]">
     <configuration name="Cufy [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -49,9 +86,30 @@
       <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="Tests in 'Cufy.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests *" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":cleanTest" />
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.Cufy [dependencies]" />
+        <item itemvalue="Gradle.Tests in 'Cufy.test'" />
       </list>
     </recent_temporary>
   </component>
@@ -77,7 +135,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1576241482806</updated>
-      <workItem from="1576241484250" duration="67000" />
+      <workItem from="1576241484250" duration="1362000" />
     </task>
     <servers />
   </component>
@@ -89,21 +147,25 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="552" y="182" key="#Project_Structure/0.0.1920.1050@0.0.1920.1050" timestamp="1576241504176" />
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1576241552872">
+    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1576242037638">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1576241552872" />
-    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1576241552872">
+    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
+    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1576242037638">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1576241552872" />
-    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1576241552872">
+    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
+    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1576242037638">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1576241552872" />
-    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1576241552872">
+    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
+    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1576242037638">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1576241552872" />
+    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
+    <state x="606" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576242874420">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="606" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1576242874420" />
   </component>
 </project>

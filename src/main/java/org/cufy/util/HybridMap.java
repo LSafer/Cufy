@@ -10,6 +10,8 @@
  */
 package org.cufy.util;
 
+import cufy.util.ObjectUtil;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;

@@ -10,7 +10,7 @@
  */
 package cufy.text;
 
-import org.cufy.util.StringUtil;
+import cufy.util.StringUtil;
 
 /**
  * Thrown to indicate that the application has attempted to convert a string to an object, but that string does not have the appropriate type.

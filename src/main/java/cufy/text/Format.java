@@ -12,7 +12,7 @@ package cufy.text;
 
 import cufy.beans.Invoke;
 import cufy.lang.Range;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.io.*;
 import java.lang.annotation.ElementType;

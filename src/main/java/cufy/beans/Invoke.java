@@ -10,9 +10,8 @@
  */
 package cufy.beans;
 
-import org.cufy.util.JetHashMap;
-import org.cufy.util.ReflectUtil;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
+import cufy.util.ReflectUtil;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Method;
@@ -108,11 +107,12 @@ public abstract class Invoke {
 	 * @version 1 release (05-Dec-2019)
 	 * @since 05-Dec-2019
 	 */
+	@SuppressWarnings("InnerClassMayBeStatic")
 	public class MethodGroup extends HashSet<Method> {
 		/**
 		 * Stores what method for what key on this group.
 		 */
-		final protected JetHashMap<Object, Method> map = new JetHashMap<>();
+		final protected Map<Object, Method> map = new HashMap<>();
 
 		/**
 		 * Initialize a new empty group.
@@ -143,7 +143,13 @@ public abstract class Invoke {
 
 		@Override
 		public boolean remove(Object method) {
-			return super.remove(method) | this.map.removeIf((key, value) -> value == method);
+			Set<Object> removed = new HashSet<>(10);
+			this.map.forEach((key, value) -> {
+				if (value == method)
+					removed.add(key);
+			});
+			removed.forEach(map::remove);
+			return super.remove(method) | removed.size() > 0;
 		}
 
 		/**

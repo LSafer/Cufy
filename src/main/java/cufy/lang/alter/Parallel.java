@@ -11,7 +11,7 @@
 package cufy.lang.alter;
 
 import cufy.lang.Loop;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.util.function.Consumer;
 

@@ -74,6 +74,7 @@
     <inspection_tool class="OtherObjC" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PackageInfoWithoutPackage" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PointerTypeRequired" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="RawUseOfParameterizedType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="RedundantSuppression" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="IGNORE_ALL" value="true" />
     </inspection_tool>
@@ -95,6 +96,7 @@
       <option name="IGNORE_UNCHECKED_CAST" value="true" />
       <option name="IGNORE_UNCHECKED_OVERRIDING" value="false" />
     </inspection_tool>
+    <inspection_tool class="UnnecessaryQualifiedReference" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="unused" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="LOCAL_VARIABLE" value="true" />
       <option name="FIELD" value="true" />

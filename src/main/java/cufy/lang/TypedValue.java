@@ -11,7 +11,7 @@
 package cufy.lang;
 
 import cufy.lang.alter.Cast;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

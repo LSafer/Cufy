@@ -13,8 +13,8 @@ package cufy.beans
 /**
  * A trait version of the interface {@link Bean}. Adding more reliability on the implementation.
  *
- * @param <K >       the type of the keys on this map
- * @param <V >       the type of the values on this map
+ * @param <K >         the type of the keys on this map
+ * @param <V >         the type of the values on this map
  * @since 25-Nov-2019
  * @version 1 release (04-Dec-2019)
  * @author LSaferSE
@@ -23,33 +23,33 @@ trait TraitBean<K, V> implements FullBean<K, V>, Serializable {
 	/**
 	 * The additional properties map of this.
 	 */
-	private transient Bean.Properties properties = new Bean.Properties<>(this)
+	private transient Properties properties = new Properties<>(this)
 
 	@Override
-	Bean.Properties getProperties() { this.properties }
+	Properties getProperties() { this.properties }
 
 	@Override
 	String toString() {
-		Iterator<Map.Entry<K, V>> entries = this.entrySet().iterator();
+		Iterator<Entry<K, V>> entries = this.entrySet().iterator()
 
 		if (!entries.hasNext()) {
-			return "{}";
+			return "{}"
 		} else {
-			StringBuilder builder = new StringBuilder("{");
+			StringBuilder builder = new StringBuilder("{")
 
 			while (true) {
-				Map.Entry<K, V> entry = entries.next();
-				Object key = entry.getKey(), value = entry.getValue();
+				Entry<K, V> entry = entries.next()
+				Object key = entry.getKey(), value = entry.getValue()
 
 				builder.append(key == this ? "(this Bean)" : key)
 						.append('=')
-						.append(value == this ? "(this Bean)" : value);
+						.append(value == this ? "(this Bean)" : value)
 
 				if (!entries.hasNext()) {
-					return builder.append('}').toString();
+					return builder.append('}').toString()
 				}
 
-				builder.append(", ");
+				builder.append(", ")
 			}
 		}
 	}
@@ -63,7 +63,7 @@ trait TraitBean<K, V> implements FullBean<K, V>, Serializable {
 	 */
 	private void readObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
 		for (int length = stream.readInt(), i = 0; i < length; i++)
-			this.put((K) stream.readObject(), (V) stream.readObject());
+			this.put((K) stream.readObject(), (V) stream.readObject())
 	}
 
 	/**
@@ -73,11 +73,11 @@ trait TraitBean<K, V> implements FullBean<K, V>, Serializable {
 	 * @throws IOException if an I/O error occurs
 	 */
 	private void writeObject(ObjectOutputStream stream) throws IOException {
-		Properties<K, V> properties = this.getProperties();
-		stream.writeInt(properties.size());
+		Properties<K, V> properties = this.getProperties()
+		stream.writeInt(properties.size())
 		for (VirtualEntry<K, V> entry : properties) {
-			stream.writeObject(entry.getKey());
-			stream.writeObject(entry.getValue());
+			stream.writeObject(entry.getKey())
+			stream.writeObject(entry.getValue())
 		}
 	}
 }

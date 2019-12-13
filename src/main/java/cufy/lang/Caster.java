@@ -11,7 +11,7 @@
 package cufy.lang;
 
 import cufy.beans.Invoke;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

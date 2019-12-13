@@ -10,7 +10,7 @@
  */
 package cufy.lang;
 
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.lang.reflect.Field;
 

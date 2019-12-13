@@ -15,7 +15,7 @@ import cufy.lang.Range;
 import cufy.text.Format;
 import cufy.text.FormatException;
 import cufy.text.ParseException;
-import org.cufy.util.ReaderUtil;
+import cufy.util.ReaderUtil;
 
 import java.io.*;
 import java.util.Base64;

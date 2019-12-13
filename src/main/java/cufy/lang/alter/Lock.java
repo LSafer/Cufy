@@ -12,7 +12,7 @@
 package cufy.lang.alter;
 
 import cufy.lang.ConcurrentException;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 import java.io.Closeable;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -19,7 +19,7 @@ import java.util.HashSet;
 @SuppressWarnings("JavaDoc")
 public class IdentifierTest {
 	@Test
-	public void no_match() {
+	public void next() {
 		Identifier<Integer, Integer> identifier = new Identifier<>(0, (i, fl)-> i+fl[0]);
 
 		HashSet<Integer> used = new HashSet<>(10);

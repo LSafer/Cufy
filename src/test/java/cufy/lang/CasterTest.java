@@ -36,7 +36,7 @@ public class CasterTest {
 		caster.cast(null, String.class);
 	}
 
-	public class TestCaster extends Caster {
+	public static class TestCaster extends Caster {
 		@Override
 		protected <T> T castNull(Class<?> out, CastPosition position) {
 			throw new NullPointerException();

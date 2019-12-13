@@ -16,10 +16,10 @@ import cufy.lang.Recurse;
 import cufy.text.Format;
 import cufy.text.FormatException;
 import cufy.text.ParseException;
-import org.cufy.util.CollectionUtil;
-import org.cufy.util.ObjectUtil;
-import org.cufy.util.ReaderUtil;
-import org.cufy.util.StringUtil;
+import cufy.util.CollectionUtil;
+import cufy.util.ObjectUtil;
+import cufy.util.ReaderUtil;
+import cufy.util.StringUtil;
 
 import java.io.*;
 import java.text.NumberFormat;

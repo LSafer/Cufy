@@ -11,7 +11,7 @@
 package cufy.lang;
 
 import cufy.lang.alter.Cast;
-import org.cufy.util.ObjectUtil;
+import cufy.util.ObjectUtil;
 
 /**
  * Defines that the implement class is a {@link Caster} user. Added more methods to direct use the {@link Caster}.
