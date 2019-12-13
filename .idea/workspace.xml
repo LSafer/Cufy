@@ -2,15 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f99d2ad7-521a-4c45-8472-d81704e6fc95" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/Sulim.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/Sulim.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/groovy/cufy/beans/TraitBean.groovy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/AbstractBean.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/Bean.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/beans/FullBean.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/groovy/cufy/beans/TraitBeanTest.groovy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/beans/AbstractBeanTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/beans/BeanTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/beans/FullBeanTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Castable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/Castable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/ConcurrentException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Instructor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/Loop.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/TypedValue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cufy/lang/TypedValue.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Cast.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/lang/Cast.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/For.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Foreach.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Lock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/Parallel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/While.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cufy/lang/alter/package-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/cufy/lang/package-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/misc/Identifier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/misc/package-info.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/HybridMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/JetHashMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/JetMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/cufy/util/package-info.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/GlobalTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cufy/lang/GlobalTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/InstructorTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/LoopTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/TypedValueTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/cufy/lang/TypedValueTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/CastTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/cufy/lang/CastTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/ForTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/ForeachTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/LockTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/ParallelTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cufy/lang/alter/WhileTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/cufy/misc/IdentifierTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/cufy/text/WrapTrackerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/cufy/text/WrapTrackerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/cufy/util/HybridMapTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/cufy/util/JetHashMapTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/cufy/util/JetMapTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +55,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1UveQn2OZjUHPyy74FejwSjSN4z" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -34,6 +65,7 @@
     <option name="sortByType" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -113,37 +145,44 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1576241482806</updated>
-      <workItem from="1576241484250" duration="2218000" />
+      <workItem from="1576241484250" duration="4986000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
   <component name="WindowStateProjectService">
     <state x="552" y="182" key="#Project_Structure" timestamp="1576241504176">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="552" y="182" key="#Project_Structure/0.0.1920.1050@0.0.1920.1050" timestamp="1576241504176" />
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1576242037638">
+    <state width="1877" height="285" key="GridCell.Tab.0.bottom" timestamp="1576243848287">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
-    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1576242037638">
+    <state width="1877" height="285" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1576243848287" />
+    <state width="1877" height="285" key="GridCell.Tab.0.center" timestamp="1576243848286">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
-    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1576242037638">
+    <state width="1877" height="285" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1576243848286" />
+    <state width="1877" height="285" key="GridCell.Tab.0.left" timestamp="1576243848286">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
-    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1576242037638">
+    <state width="1877" height="285" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1576243848286" />
+    <state width="1877" height="285" key="GridCell.Tab.0.right" timestamp="1576243848286">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1576242037638" />
+    <state width="1877" height="285" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1576243848286" />
     <state x="606" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1576242874420">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="606" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1576242874420" />
+    <state x="342" y="136" key="new project wizard" timestamp="1576245576481">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="342" y="136" key="new project wizard/0.0.1920.1050@0.0.1920.1050" timestamp="1576245576481" />
   </component>
 </project>

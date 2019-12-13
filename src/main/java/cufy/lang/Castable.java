@@ -10,7 +10,7 @@
  */
 package cufy.lang;
 
-import cufy.lang.alter.Cast;
+import org.cufy.lang.Cast;
 import cufy.util.ObjectUtil;
 
 /**

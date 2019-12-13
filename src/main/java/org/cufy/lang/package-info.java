@@ -8,12 +8,11 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-
-package org.cufy.util;
-
-@SuppressWarnings("JavaDoc")
-public class HybridMapTest {
-	public void test() {
-		//TODO test
-	}
-}
+/**
+ * Object alternatives for the java syntax.
+ *
+ * @author LSaferSE
+ * @version 2 release (07-Dec-19)
+ * @since 07-Dec-19
+ */
+package org.cufy.lang;

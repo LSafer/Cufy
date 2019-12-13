@@ -11,7 +11,7 @@
 
 package cufy.lang;
 
-import cufy.lang.alter.Cast;
+import org.cufy.lang.Cast;
 import org.junit.Assert;
 import org.junit.Test;
 

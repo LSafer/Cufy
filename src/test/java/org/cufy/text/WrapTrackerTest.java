@@ -17,7 +17,7 @@ import org.junit.Test;
 @SuppressWarnings("JavaDoc")
 public class WrapTrackerTest {
 	@Test
-	public void append_size() {
+	public void append_length() {
 		WrapTracker tracker = new WrapTracker();
 		tracker.append("{");
 		tracker.append("e");

@@ -2,12 +2,17 @@
   <dictionary name="Sulim">
     <words>
       <w>aina</w>
+      <w>bais</w>
+      <w>baos</w>
+      <w>codehaus</w>
+      <w>deja</w>
       <w>guillemet</w>
       <w>ignoration</w>
       <w>nonpositive</w>
       <w>parenthese</w>
       <w>subin</w>
       <w>subout</w>
+      <w>throwables</w>
     </words>
   </dictionary>
 </component>
