@@ -1,4 +1,5 @@
-.gradle
+/.gradle
+/.idea
 /build/
 
 # Ignore Gradle GUI config
@@ -12,5 +13,4 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
-.idea/workspace.xml
 .idea/workspace.xml
