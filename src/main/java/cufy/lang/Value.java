@@ -10,7 +10,7 @@
  */
 package cufy.lang;
 
-import org.cufy.lang.Cast;
+import org.cufy.lang.BaseConverter;
 import cufy.util.ObjectUtil;
 
 import java.lang.annotation.Retention;
@@ -24,13 +24,13 @@ import java.lang.annotation.RetentionPolicy;
  * @since 21-Nov-2019
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TypedValue {
+public @interface Value {
 	/**
 	 * The caster to be used to cast the value.
 	 *
 	 * @return the caster to be used to cast this value
 	 */
-	Class<? extends Caster> caster() default Cast.class;
+	Class<? extends Converter> converter() default BaseConverter.class;
 
 	/**
 	 * Whether this value equals to null or not.
@@ -51,7 +51,7 @@ public @interface TypedValue {
 	 *
 	 * @return the source string
 	 */
-	String value();
+	String value() default "";
 
 	/**
 	 * Tools for this annotation. (aka static methods).
@@ -65,10 +65,10 @@ public @interface TypedValue {
 		 * @throws NullPointerException       if the given value is null
 		 * @throws IllegalAnnotationException if ANY throwable get thrown while constructing the object
 		 */
-		public static Object construct(TypedValue value) {
+		public static Object construct(Value value) {
 			try {
 				ObjectUtil.requireNonNull(value, "value");
-				return value.isnull() ? null : Global.get(value.caster()).cast(value.value(), (Class<? super Object>) value.type());
+				return value.isnull() ? null : Global.get(value.converter()).convert(value.value(), (Class<? super Object>) value.type());
 			} catch (Throwable t) {
 				throw new IllegalAnnotationException("Can't construct " + value.getClass() + ": " + t.getMessage(), t);
 			}
@@ -84,7 +84,7 @@ public @interface TypedValue {
 		 * @throws NullPointerException       if the given value is null
 		 * @throws IllegalAnnotationException if ANY throwable get thrown while constructing the object
 		 */
-		public static <T> T construct(TypedValue value, Class<T> expected) {
+		public static <T> T construct(Value value, Class<T> expected) {
 			ObjectUtil.requireNonNull(value, "value");
 			ObjectUtil.requireNonNull(expected, "expected");
 

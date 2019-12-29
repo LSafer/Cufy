@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
  * @since 21-Nov-2019
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Range {
+public @interface Type {
 	/**
 	 * Classes in range (subclasses NOT included).
 	 *
@@ -62,28 +62,28 @@ public @interface Range {
 		/**
 		 * Check whether the given class is in the given range or not.
 		 *
-		 * @param range to check if the class is in
+		 * @param type to check if the class is in
 		 * @param klass to be checked
 		 * @return whether the given class is in the given range or not
 		 * @throws NullPointerException if ether the given range or class is null
 		 */
-		public static boolean test(Range range, Class<?> klass) {
-			ObjectUtil.requireNonNull(range, "range");
+		public static boolean test(Type type, Class<?> klass) {
+			ObjectUtil.requireNonNull(type, "range");
 			ObjectUtil.requireNonNull(klass, "klass");
 
-			for (Class<?> exclude : range.out())
+			for (Class<?> exclude : type.out())
 				if (exclude == klass)
 					return false;
 
-			for (Class<?> include : range.in())
+			for (Class<?> include : type.in())
 				if (include == klass)
 					return true;
 
-			for (Class<?> exclude : range.subout())
+			for (Class<?> exclude : type.subout())
 				if (exclude.isAssignableFrom(klass))
 					return false;
 
-			for (Class<?> include : range.subin())
+			for (Class<?> include : type.subin())
 				if (include.isAssignableFrom(klass))
 					return true;
 

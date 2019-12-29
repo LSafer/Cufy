@@ -18,32 +18,32 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("JavaDoc")
-public class CasterTest {
-	private TestCaster caster = new TestCaster();
+public class ConverterTest {
+	private TestConverter caster = new TestConverter();
 
 	@Test(timeout = 50)
 	public void cast() {
-		Assert.assertEquals("Wrong cast", "abc", caster.cast(new StringBuilder("abc"), String.class));
+		Assert.assertEquals("Wrong cast", "abc", caster.convert(new StringBuilder("abc"), String.class));
 	}
 
 	@Test(expected = ClassCastException.class)
 	public void castElse() {
-		caster.cast(new Object(), List.class);
+		caster.convert(new Object(), List.class);
 	}
 
 	@Test(timeout = 50, expected = NullPointerException.class)
 	public void castNull() {
-		caster.cast(null, String.class);
+		caster.convert(null, String.class);
 	}
 
-	public static class TestCaster extends Caster {
+	public static class TestConverter extends Converter {
 		@Override
-		protected <T> T castNull(Class<?> out, CastPosition position) {
+		protected <T> T convertNull(Class<?> out, ConvertPosition position) {
 			throw new NullPointerException();
 		}
 
-		@CastMethod(in = @Range(subin = CharSequence.class), out = @Range(in = String.class))
-		public String cast(CharSequence object, Class<String> klass, CastPosition position) {
+		@ConvertMethod(in = @Type(subin = CharSequence.class), out = @Type(in = String.class))
+		public String cast(CharSequence object, Class<String> klass, ConvertPosition position) {
 			Objects.requireNonNull(position, "position");
 			Objects.requireNonNull(object, "object");
 			return String.valueOf(object);

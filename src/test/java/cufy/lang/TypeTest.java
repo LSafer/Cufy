@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("JavaDoc")
-public class RangeTest {
+public class TypeTest {
 	@Test(timeout = 50)
 	public void in_out_subin_subout() {
-		Range range = this.newRange(
+		Type type = this.newRange(
 				new Class[]{Map.class}, //in
 				new Class[]{HashMap.class}, //out
 				new Class[]{List.class}, //subin
@@ -32,20 +32,20 @@ public class RangeTest {
 		);
 
 		//in
-		Assert.assertTrue("Map is absolute included", Range.util.test(range, Map.class));
-		Assert.assertFalse("Number is not included anywhere", Range.util.test(range, Number.class));
+		Assert.assertTrue("Map is absolute included", Type.util.test(type, Map.class));
+		Assert.assertFalse("Number is not included anywhere", Type.util.test(type, Number.class));
 		//out
-		Assert.assertFalse("HashMap is absolute excluded", Range.util.test(range, HashMap.class));
+		Assert.assertFalse("HashMap is absolute excluded", Type.util.test(type, HashMap.class));
 		//subin
-		Assert.assertTrue("List is absolute included", Range.util.test(range, List.class));
-		Assert.assertTrue("ArrayList is a sub included", Range.util.test(range, ArrayList.class));
+		Assert.assertTrue("List is absolute included", Type.util.test(type, List.class));
+		Assert.assertTrue("ArrayList is a sub included", Type.util.test(type, ArrayList.class));
 		//subout
-		Assert.assertFalse("CharSequence is absolute excluded", Range.util.test(range, CharSequence.class));
-		Assert.assertFalse("String is sub excluded", Range.util.test(range, String.class));
+		Assert.assertFalse("CharSequence is absolute excluded", Type.util.test(type, CharSequence.class));
+		Assert.assertFalse("String is sub excluded", Type.util.test(type, String.class));
 	}
 
-	private Range newRange(Class<?>[] in, Class<?>[] out, Class<?>[] subin, Class<?>[] subout) {
-		return new Range() {
+	private Type newRange(Class<?>[] in, Class<?>[] out, Class<?>[] subin, Class<?>[] subout) {
+		return new Type() {
 			@Override
 			public Class<? extends Annotation> annotationType() {
 				return null;

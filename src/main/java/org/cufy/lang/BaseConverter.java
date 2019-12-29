@@ -10,10 +10,10 @@
  */
 package org.cufy.lang;
 
-import cufy.lang.Caster;
+import cufy.lang.Converter;
 import cufy.lang.Global;
-import cufy.lang.Range;
 import cufy.lang.Recurse;
+import cufy.lang.Type;
 import cufy.util.CollectionUtil;
 import cufy.util.ObjectUtil;
 import cufy.util.StringUtil;
@@ -87,16 +87,16 @@ import java.util.*;
  * @version 3 release (26-Nov-2019)
  * @since 31-Aug-19
  */
-public class Cast extends Caster implements Global {
+public class BaseConverter extends Converter implements Global {
 	/**
 	 * The global instance to avoid unnecessary instancing.
 	 */
-	final public static Cast global = new Cast();
+	final public static BaseConverter global = new BaseConverter();
 
 	@StaticMethod
 	@Override
-	protected ClayCastPosition newCastPosition() {
-		return new ClayCastPosition();
+	protected BaseConvertPosition newConvertPosition() {
+		return new BaseConvertPosition();
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class Cast extends Caster implements Global {
 	 * @param <T>        the targeted type
 	 * @return the value of the given collection on an array of the given class
 	 */
-	@CastMethod(in = @Range(subin = {
+	@ConvertMethod(in = @Type(subin = {
 			Collection.class,
 			Object[].class,
 			boolean[].class,
@@ -118,7 +118,7 @@ public class Cast extends Caster implements Global {
 			float[].class,
 			long[].class,
 			short[].class
-	}), out = @Range(subin = {
+	}), out = @Type(subin = {
 			Object[].class,
 			boolean[].class,
 			byte[].class,
@@ -128,7 +128,7 @@ public class Cast extends Caster implements Global {
 			long[].class,
 			short[].class
 	}))
-	protected <T> T collection2array(Object collection, Class<? super T> out, ClayCastPosition position) {
+	protected <T> T collection2array(Object collection, Class<? super T> out, BaseConvertPosition position) {
 		Collection<?> elements = CollectionUtil.from(collection);
 
 		Class<?> type = out.getComponentType();
@@ -136,7 +136,7 @@ public class Cast extends Caster implements Global {
 
 		int i = 0;
 		for (Object element : elements)
-			Array.set(array, i++, position.cast(element, (Class<? super Object>) type, collection, array));
+			Array.set(array, i++, position.convert(element, (Class<? super Object>) type, collection, array));
 
 		return array;
 	}
@@ -150,7 +150,7 @@ public class Cast extends Caster implements Global {
 	 * @param <C>        the targeted type
 	 * @return the value of the given collection on a collection of the given class
 	 */
-	@CastMethod(out = @Range(subin = Collection.class), in = @Range(subin = {
+	@ConvertMethod(out = @Type(subin = Collection.class), in = @Type(subin = {
 			Collection.class,
 			Object[].class,
 			boolean[].class,
@@ -161,14 +161,14 @@ public class Cast extends Caster implements Global {
 			long[].class,
 			short[].class
 	}))
-	protected <C extends Collection<?>> C collection2collection(Object collection, Class<? super C> out, ClayCastPosition position) {
+	protected <C extends Collection<?>> C collection2collection(Object collection, Class<? super C> out, BaseConvertPosition position) {
 		try {
 			Collection<?> elements = CollectionUtil.from(collection);
 			C collection1 = (C) out.getConstructor().newInstance();
 
 			int i;
 			for (Object element : elements)
-				collection1.add(position.cast(element, Object.class, collection, collection1));
+				collection1.add(position.convert(element, Object.class, collection, collection1));
 
 			return collection1;
 		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
@@ -185,7 +185,7 @@ public class Cast extends Caster implements Global {
 	 * @param <M>        the targeted type
 	 * @return the value of the given collection on a map of the given class
 	 */
-	@CastMethod(out = @Range(subin = Map.class), in = @Range(subin = {
+	@ConvertMethod(out = @Type(subin = Map.class), in = @Type(subin = {
 			Collection.class,
 			Object[].class,
 			boolean[].class,
@@ -196,14 +196,14 @@ public class Cast extends Caster implements Global {
 			long[].class,
 			short[].class
 	}))
-	protected <M extends Map<?, ?>> M collection2map(Object collection, Class<? super M> out, ClayCastPosition position) {
+	protected <M extends Map<?, ?>> M collection2map(Object collection, Class<? super M> out, BaseConvertPosition position) {
 		try {
 			Collection<?> elements = CollectionUtil.from(collection);
 			M map = (M) out.getConstructor().newInstance();
 
 			int i = 0;
 			for (Object element : elements)
-				((Map<Object, Object>) map).put(i++, position.cast(element, Object.class, collection, map));
+				((Map<Object, Object>) map).put(i++, position.convert(element, Object.class, collection, map));
 
 			return map;
 		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
@@ -220,8 +220,8 @@ public class Cast extends Caster implements Global {
 	 * @param <F>      the targeted type
 	 * @return the value of the given file on a file of the given class
 	 */
-	@CastMethod(in = @Range(subin = File.class), out = @Range(subout = File.class))
-	protected <F extends File> F file2file(File file, Class<? super F> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = File.class), out = @Type(subout = File.class))
+	protected <F extends File> F file2file(File file, Class<? super F> out, BaseConvertPosition position) {
 		try {
 			return (F) out.getConstructor(String.class).newInstance(file.toString());
 		} catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
@@ -238,7 +238,7 @@ public class Cast extends Caster implements Global {
 	 * @param <T>      the targeted type
 	 * @return the value of the given map on a array of the given class
 	 */
-	@CastMethod(in = @Range(subin = Map.class), out = @Range(subin = {
+	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = {
 			Object[].class,
 			boolean[].class,
 			byte[].class,
@@ -248,7 +248,7 @@ public class Cast extends Caster implements Global {
 			long[].class,
 			short[].class
 	}))
-	protected <T> T map2array(Map<?, ?> map, Class<? super T> out, ClayCastPosition position) {
+	protected <T> T map2array(Map<?, ?> map, Class<? super T> out, BaseConvertPosition position) {
 		return this.collection2array(this.map2list(map, ArrayList.class, position), out, position);
 	}
 
@@ -261,8 +261,8 @@ public class Cast extends Caster implements Global {
 	 * @param <C>      the targeted type
 	 * @return the value of the given map on a collection of the given class
 	 */
-	@CastMethod(in = @Range(subin = Map.class), out = @Range(subin = Collection.class, out = List.class))
-	protected <C extends Collection<?>> C map2collection(Map<?, ?> map, Class<? super C> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Collection.class, out = List.class))
+	protected <C extends Collection<?>> C map2collection(Map<?, ?> map, Class<? super C> out, BaseConvertPosition position) {
 		try {
 			C collection = (C) out.getConstructor().newInstance();
 			((Collection<Object>) collection).addAll(map.values());
@@ -281,8 +281,8 @@ public class Cast extends Caster implements Global {
 	 * @param <L>      the targeted type
 	 * @return the value of the given map on a list of the given class
 	 */
-	@CastMethod(in = @Range(subin = Map.class), out = @Range(subin = List.class))
-	protected <L extends List<?>> L map2list(Map<?, ?> map, Class<? super L> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = List.class))
+	protected <L extends List<?>> L map2list(Map<?, ?> map, Class<? super L> out, BaseConvertPosition position) {
 		try {
 			L list = (L) out.getConstructor().newInstance();
 
@@ -313,8 +313,8 @@ public class Cast extends Caster implements Global {
 	 * @param <M>      the targeted type
 	 * @return the value of the given map on a map of the given class
 	 */
-	@CastMethod(in = @Range(subin = Map.class), out = @Range(subin = Map.class))
-	protected <M extends Map<?, ?>> M map2map(Map<?, ?> map, Class<? super M> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Map.class))
+	protected <M extends Map<?, ?>> M map2map(Map<?, ?> map, Class<? super M> out, BaseConvertPosition position) {
 		try {
 			M instance = (M) out.getConstructor().newInstance();
 			((Map<Object, Object>) instance).putAll(map);
@@ -332,8 +332,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as byte
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Byte.class, byte.class}))
-	protected Byte number2byte(Number number, Class<Byte> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Byte.class, byte.class}))
+	protected Byte number2byte(Number number, Class<Byte> out, BaseConvertPosition position) {
 		return number.byteValue();
 	}
 
@@ -345,8 +345,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as double
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Double.class, double.class}))
-	protected Double number2double(Number number, Class<Double> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Double.class, double.class}))
+	protected Double number2double(Number number, Class<Double> out, BaseConvertPosition position) {
 		return number.doubleValue();
 	}
 
@@ -358,8 +358,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as float
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Float.class, float.class}))
-	protected Float number2float(Number number, Class<Float> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Float.class, float.class}))
+	protected Float number2float(Number number, Class<Float> out, BaseConvertPosition position) {
 		return number.floatValue();
 	}
 
@@ -371,8 +371,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as integer
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Integer.class, int.class}))
-	protected Integer number2integer(Number number, Class<Integer> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Integer.class, int.class}))
+	protected Integer number2integer(Number number, Class<Integer> out, BaseConvertPosition position) {
 		return number.intValue();
 	}
 
@@ -384,8 +384,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as long
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Long.class, long.class}))
-	protected Long number2long(Number number, Class<Long> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Long.class, long.class}))
+	protected Long number2long(Number number, Class<Long> out, BaseConvertPosition position) {
 		return number.longValue();
 	}
 
@@ -397,8 +397,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the value of the given number as short
 	 */
-	@CastMethod(in = @Range(subin = Number.class), out = @Range(in = {Short.class, short.class}))
-	protected Short number2short(Number number, Class<Short> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Short.class, short.class}))
+	protected Short number2short(Number number, Class<Short> out, BaseConvertPosition position) {
 		return number.shortValue();
 	}
 
@@ -410,8 +410,8 @@ public class Cast extends Caster implements Global {
 	 * @param position the position to depend on
 	 * @return the string representation of the Object argument
 	 */
-	@CastMethod(in = @Range(subin = Object.class), out = @Range(in = String.class))
-	protected String object2string(Object object, Class<String> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Object.class), out = @Type(in = String.class))
+	protected String object2string(Object object, Class<String> out, BaseConvertPosition position) {
 //		return JSON.global.format(object); We are in Java not JSON :)
 		return String.valueOf(object);
 	}
@@ -424,8 +424,8 @@ public class Cast extends Caster implements Global {
 	 * @param position to depend on
 	 * @return the source object of the given recurse object
 	 */
-	@CastMethod(in = @Range(subin = Recurse.class), out = @Range(subin = Object.class))
-	protected Object recurse2object(Object recurse, Class<?> out, ClayCastPosition position) {
+	@ConvertMethod(in = @Type(subin = Recurse.class), out = @Type(subin = Object.class))
+	protected Object recurse2object(Object recurse, Class<?> out, BaseConvertPosition position) {
 		Object object = position.parents.get(recurse);
 		if (object == null)
 			throw new IllegalArgumentException("Not recurse!:" + StringUtil.logging(recurse));
@@ -442,7 +442,7 @@ public class Cast extends Caster implements Global {
 	 * @param position to depend on
 	 * @return the given sequence parsed to the given class
 	 */
-	@CastMethod(in = @Range(subin = CharSequence.class), out = @Range(subin = {
+	@ConvertMethod(in = @Type(subin = CharSequence.class), out = @Type(subin = {
 			Object.class,
 			boolean.class,
 			byte.class,
@@ -453,14 +453,14 @@ public class Cast extends Caster implements Global {
 			long.class,
 			short.class,
 	}))
-	protected Object sequence2object(CharSequence sequence, Class<?> out, ClayCastPosition position) {
-		return this.cast(JSON.global.parse(sequence), (Class<? super Object>) out);
+	protected Object sequence2object(CharSequence sequence, Class<?> out, BaseConvertPosition position) {
+		return this.convert(JSON.global.parse(sequence), (Class<? super Object>) out);
 	}
 
 	/**
 	 * Helps to effect the casting behavior depending on the casting position.
 	 */
-	public class ClayCastPosition implements CastPosition {
+	public class BaseConvertPosition implements ConvertPosition {
 		/**
 		 * The casting parents mappings. Helps match the recursive storing.
 		 *
@@ -472,7 +472,7 @@ public class Cast extends Caster implements Global {
 		/**
 		 * Default constructor.
 		 */
-		public ClayCastPosition() {
+		public BaseConvertPosition() {
 		}
 
 		/**
@@ -483,7 +483,7 @@ public class Cast extends Caster implements Global {
 		 * @param instanceParent a recurse mapping for the source
 		 * @throws NullPointerException if 'parents' equals null
 		 */
-		public ClayCastPosition(Map<Object, Object> parents, Object sourceParent, Object instanceParent) {
+		public BaseConvertPosition(Map<Object, Object> parents, Object sourceParent, Object instanceParent) {
 			ObjectUtil.requireNonNull(parents, "parents");
 			this.parents.putAll(parents);
 			this.parents.put(sourceParent, instanceParent);
@@ -502,8 +502,8 @@ public class Cast extends Caster implements Global {
 		 * @throws ClassCastException       on casting failure
 		 * @throws IllegalArgumentException optional. on casting failure
 		 */
-		public <T> T cast(Object object, Class<? super T> out, Object sourceParent, Object instanceParent) {
-			return this.cast(object, out, null, null, false, sourceParent, instanceParent);
+		public <T> T convert(Object object, Class<? super T> out, Object sourceParent, Object instanceParent) {
+			return this.convert(object, out, null, null, false, sourceParent, instanceParent);
 		}
 
 		/**
@@ -523,15 +523,15 @@ public class Cast extends Caster implements Global {
 		 * @throws IllegalArgumentException optional. on casting failure
 		 * @throws NullPointerException     if the 'out' param equals to null
 		 */
-		public <T> T cast(Object object, Class<? super T> out, ClayCastPosition position, Class<?> in, boolean clone, Object sourceParent, Object instanceParent) {
+		public <T> T convert(Object object, Class<? super T> out, BaseConvertPosition position, Class<?> in, boolean clone, Object sourceParent, Object instanceParent) {
 			ObjectUtil.requireNonNull(out, "out");
 
 			if (position == null)
-				position = new ClayCastPosition(this.parents, sourceParent, instanceParent);
+				position = new BaseConvertPosition(this.parents, sourceParent, instanceParent);
 			if (in == null)
 				in = this.parents.containsKey(object) ? Recurse.class : null;
 
-			return Cast.this.cast(object, out, position, in, clone);
+			return BaseConverter.this.convert(object, out, position, in, clone);
 		}
 	}
 }

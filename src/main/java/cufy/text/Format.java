@@ -11,7 +11,7 @@
 package cufy.text;
 
 import cufy.beans.Invoke;
-import cufy.lang.Range;
+import cufy.lang.Type;
 import cufy.util.ObjectUtil;
 
 import java.io.*;
@@ -300,6 +300,7 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if any argument given is null
 	 * @throws IOException          if any I/O exception occurs
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	@StaticMethod
 	protected void format0(Method method, Object object, Writer writer, FormatPosition position) throws IOException {
 		ObjectUtil.requireNonNull(method, "method");
@@ -376,7 +377,7 @@ public abstract class Format extends Invoke {
 	protected synchronized Method getFormatMethod(Class<?> klass) {
 		ObjectUtil.requireNonNull(klass, "klass");
 		return this.getMethodGroup(FormatMethod.class).get(klass, method ->
-				Range.util.test(method.getAnnotation(FormatMethod.class).in(), klass));
+				Type.util.test(method.getAnnotation(FormatMethod.class).in(), klass));
 	}
 
 	/**
@@ -390,7 +391,7 @@ public abstract class Format extends Invoke {
 	protected synchronized Method getParseMethod(Class<?> klass) {
 		ObjectUtil.requireNonNull(klass, "klass");
 		return this.getMethodGroup(ParseMethod.class).get(klass, method ->
-				Range.util.test(method.getAnnotation(ParseMethod.class).out(), klass));
+				Type.util.test(method.getAnnotation(ParseMethod.class).out(), klass));
 	}
 
 	/**
@@ -445,6 +446,7 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if any of the given parameters is null
 	 * @throws IOException          if any I/O exception occurs
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	@StaticMethod
 	protected void parse0(Method method, Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
 		ObjectUtil.requireNonNull(method, "method");
@@ -561,7 +563,7 @@ public abstract class Format extends Invoke {
 		 *
 		 * @return the supported/unsupported classes
 		 */
-		Range in() default @Range;
+		Type in() default @Type;
 	}
 
 	/**
@@ -581,6 +583,6 @@ public abstract class Format extends Invoke {
 		 *
 		 * @return the magnet values for the classify method
 		 */
-		Range out() default @Range;
+		Type out() default @Type;
 	}
 }

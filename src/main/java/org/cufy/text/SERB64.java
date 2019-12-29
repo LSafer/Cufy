@@ -11,7 +11,7 @@
 package org.cufy.text;
 
 import cufy.lang.Global;
-import cufy.lang.Range;
+import cufy.lang.Type;
 import cufy.text.Format;
 import cufy.text.FormatException;
 import cufy.text.ParseException;
@@ -70,7 +70,7 @@ public class SERB64 extends Format implements Global {
 	 * @throws FormatException          when any formatting errors occurs
 	 * @throws IOException              if any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(subin = {
+	@FormatMethod(in = @Type(subin = {
 			Serializable.class,
 			Serializable[].class,
 			boolean.class,
@@ -123,7 +123,7 @@ public class SERB64 extends Format implements Global {
 	 * @throws IOException            if any I/O exception occurs
 	 * @throws ClassNotFoundException class of a serialized object cannot be found.
 	 */
-	@ParseMethod(out = @Range(subin = Serializable.class))
+	@ParseMethod(out = @Type(subin = Serializable.class))
 	protected void parseSerializable(Reader reader, AtomicReference<Serializable> buffer, ParsePosition position) throws IOException, ClassNotFoundException {
 		String string = ReaderUtil.read(reader);
 		byte[] bytes = Base64.getDecoder().decode(string);

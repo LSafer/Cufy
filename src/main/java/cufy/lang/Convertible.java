@@ -10,17 +10,17 @@
  */
 package cufy.lang;
 
-import org.cufy.lang.Cast;
 import cufy.util.ObjectUtil;
+import org.cufy.lang.BaseConverter;
 
 /**
- * Defines that the implement class is a {@link Caster} user. Added more methods to direct use the {@link Caster}.
+ * Defines that the implement class is a {@link Converter} user. Added more methods to direct use the {@link Converter}.
  *
  * @author LSaferSE
  * @version 3 release (07-Dec-2019)
  * @since 31-Aug-19
  */
-public interface Castable {
+public interface Convertible {
 	/**
 	 * Cast this instance to the given class. And if this isn't instance of the given class then make a new instance of the given class with data of
 	 * this. By using the caster of this
@@ -34,7 +34,20 @@ public interface Castable {
 	 */
 	default <T> T as(Class<? super T> klass) {
 		ObjectUtil.requireNonNull(klass, "klass");
-		return this.caster().cast(this, klass, null, null, false);
+		return this.converter().convert(this, klass, null, null, false);
+	}
+
+	/**
+	 * Clone this class into a new instance of the given class.
+	 *
+	 * @param klass to get a new instance of (or null for the class of this instance)
+	 * @param <T>   type of the new clone
+	 * @return a new clone casted from this to the given class
+	 * @throws ClassCastException       on casting failure
+	 * @throws IllegalArgumentException optional. on casting failure
+	 */
+	default <T> T clone(Class<? super T> klass) {
+		return this.converter().convert(this, klass == null ? (Class<? super T>) this.getClass() : klass, null, null, true);
 	}
 
 	/**
@@ -51,7 +64,7 @@ public interface Castable {
 	 * class.
 	 * @implSpec Return null to skip to the caster casting methods.
 	 */
-	default <T> T castTo(Class<? super T> klass, Caster.CastPosition position) {
+	default <T> T convertTo(Class<? super T> klass, Converter.ConvertPosition position) {
 		ObjectUtil.requireNonNull(klass, "klass");
 		ObjectUtil.requireNonNull(position, "position");
 		return null;
@@ -62,20 +75,7 @@ public interface Castable {
 	 *
 	 * @return the caster used by this
 	 */
-	default Caster caster() {
-		return Cast.global;
-	}
-
-	/**
-	 * Clone this class into a new instance of the given class.
-	 *
-	 * @param klass to get a new instance of (or null for the class of this instance)
-	 * @param <T>   type of the new clone
-	 * @return a new clone casted from this to the given class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
-	 */
-	default <T> T clone(Class<? super T> klass) {
-		return this.caster().cast(this, klass == null ? (Class<? super T>) this.getClass() : klass, null, null, true);
+	default Converter converter() {
+		return BaseConverter.global;
 	}
 }

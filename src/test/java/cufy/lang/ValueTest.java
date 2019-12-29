@@ -11,18 +11,18 @@
 
 package cufy.lang;
 
-import org.cufy.lang.Cast;
+import org.cufy.lang.BaseConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
 
 @SuppressWarnings("JavaDoc")
-public class TypedValueTest {
+public class ValueTest {
 	@Test(timeout = 50)
 	public void get() {
-		TypedValue typedValue = newTypedValue(null, Integer[].class, "[3, 5, 2]", false);
-		Integer[] value = (Integer[]) TypedValue.util.construct(typedValue);
+		Value typedValue = newTypedValue(null, Integer[].class, "[3, 5, 2]", false);
+		Integer[] value = (Integer[]) Value.util.construct(typedValue);
 
 		Assert.assertNotNull("Null not expected", value);
 		Assert.assertEquals("Wrong length", 3, value.length);
@@ -31,16 +31,16 @@ public class TypedValueTest {
 		Assert.assertEquals("Wrong 3rd element", (Integer) 2, value[2]);
 	}
 
-	public TypedValue newTypedValue(Class<? extends Caster> caster, Class<?> type, String value, boolean isnull) {
-		return new TypedValue() {
+	public Value newTypedValue(Class<? extends Converter> caster, Class<?> type, String value, boolean isnull) {
+		return new Value() {
 			@Override
 			public Class<? extends Annotation> annotationType() {
-				return TypedValue.class;
+				return Value.class;
 			}
 
 			@Override
-			public Class<? extends Caster> caster() {
-				return caster == null ? Cast.class : caster;
+			public Class<? extends Converter> converter() {
+				return caster == null ? BaseConverter.class : caster;
 			}
 
 			/**

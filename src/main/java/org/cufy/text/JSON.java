@@ -11,8 +11,8 @@
 package org.cufy.text;
 
 import cufy.lang.Global;
-import cufy.lang.Range;
 import cufy.lang.Recurse;
+import cufy.lang.Type;
 import cufy.text.Format;
 import cufy.text.FormatException;
 import cufy.text.ParseException;
@@ -145,7 +145,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(subin = {
+	@FormatMethod(in = @Type(subin = {
 			Collection.class,
 			Object[].class,
 			boolean[].class,
@@ -195,7 +195,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(in = Boolean.class))
+	@FormatMethod(in = @Type(in = Boolean.class))
 	protected void formatBoolean(Boolean aBoolean, Writer writer, JSONFormatPosition position) throws IOException {
 		writer.append(aBoolean ? val.TRUE : val.FALSE);
 	}
@@ -209,7 +209,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(subin = {
+	@FormatMethod(in = @Type(subin = {
 			Number.class,
 			double.class,
 			float.class,
@@ -229,7 +229,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(subin = Map.class))
+	@FormatMethod(in = @Type(subin = Map.class))
 	protected void formatObject(Map<?, ?> object, Writer writer, JSONFormatPosition position) throws IOException {
 		Iterator<? extends Map.Entry<?, ?>> iterator = object.entrySet().iterator();
 
@@ -273,7 +273,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(in = Recurse.class))
+	@FormatMethod(in = @Type(in = Recurse.class))
 	protected void formatRecurse(Object recurse, Writer writer, JSONFormatPosition position) throws IOException {
 		int index = position.parents.indexOf(recurse);
 		if (index == -1)
@@ -291,7 +291,7 @@ public class JSON extends Format implements Global {
 	 * @throws FormatException when any formatting errors occurs
 	 * @throws IOException     when any I/O exception occurs
 	 */
-	@FormatMethod(in = @Range(subin = CharSequence.class))
+	@FormatMethod(in = @Type(subin = CharSequence.class))
 	protected void formatString(CharSequence string, Writer writer, JSONFormatPosition position) throws IOException {
 		writer.append(symbol.STRING_START)
 				.append(string.toString()
@@ -400,13 +400,14 @@ public class JSON extends Format implements Global {
 	 * @throws ParseException when any parsing exception occurs
 	 * @throws IOException    when any I/O exception occurs
 	 */
-	@ParseMethod(out = @Range(subin = Collection.class))
+	@ParseMethod(out = @Type(subin = Collection.class))
 	protected void parseArray(Reader reader, AtomicReference<Collection<Object>> buffer, JSONParsePosition position) throws IOException {
 		buffer.set(new ArrayList<>(10));
 		WrapTracker tracker = new WrapTracker();
 		StringBuilder builder = new StringBuilder(50);
 
 		//skip '['
+		//noinspection ResultOfMethodCallIgnored
 		reader.skip(1);
 
 		int i;
@@ -441,7 +442,7 @@ public class JSON extends Format implements Global {
 	 * @throws ParseException when any parsing exception occurs
 	 * @throws IOException    when any I/O exception occurs
 	 */
-	@ParseMethod(out = @Range(in = Boolean.class))
+	@ParseMethod(out = @Type(in = Boolean.class))
 	protected void parseBoolean(Reader reader, AtomicReference<Boolean> buffer, JSONParsePosition position) throws IOException {
 		String string = ReaderUtil.read(reader).trim();
 		Boolean value = string.equals(val.TRUE) ? (Boolean) true : string.equals(val.FALSE) ? false : null;
@@ -458,7 +459,7 @@ public class JSON extends Format implements Global {
 	 * @throws IOException              when any I/O exception occurs
 	 * @throws java.text.ParseException if the number on the string can't be parsed
 	 */
-	@ParseMethod(out = @Range(subin = Number.class))
+	@ParseMethod(out = @Type(subin = Number.class))
 	protected void parseNumber(Reader reader, AtomicReference<Number> buffer, JSONParsePosition position) throws IOException, java.text.ParseException {
 		String string = ReaderUtil.read(reader).trim();
 		Number value = NumberFormat.getInstance(Locale.ENGLISH).parse(string);
@@ -474,13 +475,14 @@ public class JSON extends Format implements Global {
 	 * @throws ParseException when any parsing exception occurs
 	 * @throws IOException    when any I/O exception occurs
 	 */
-	@ParseMethod(out = @Range(subin = Map.class))
+	@ParseMethod(out = @Type(subin = Map.class))
 	protected void parseObject(Reader reader, AtomicReference<Map<Object, Object>> buffer, JSONParsePosition position) throws IOException {
 		buffer.set(new HashMap<>(10));
 		WrapTracker tracker = new WrapTracker();
 		StringBuilder builder = new StringBuilder(50), key = null;
 
 		//skip '{'
+		//noinspection ResultOfMethodCallIgnored
 		reader.skip(1);
 
 		int i;
@@ -528,7 +530,7 @@ public class JSON extends Format implements Global {
 	 * @throws IOException              when any I/O exception occurs
 	 * @throws java.text.ParseException when any parsing exception occurs
 	 */
-	@ParseMethod(out = @Range(in = Recurse.class))
+	@ParseMethod(out = @Type(in = Recurse.class))
 	protected void parseRecurse(Reader reader, AtomicReference<Object> buffer, JSONParsePosition position) throws IOException, java.text.ParseException {
 		String string = ReaderUtil.read(reader).trim();
 		String indexString = string.replaceFirst(val.RECURSE, "");
@@ -546,7 +548,7 @@ public class JSON extends Format implements Global {
 	 * @throws ParseException when any parsing exception occurs
 	 * @throws IOException    when any I/O exception occurs
 	 */
-	@ParseMethod(out = @Range(subin = CharSequence.class))
+	@ParseMethod(out = @Type(subin = CharSequence.class))
 	protected void parseString(Reader reader, AtomicReference<String> buffer, JSONParsePosition position) throws IOException {
 		String string = ReaderUtil.read(reader).trim();
 		String value = string.substring(1, string.length() - 1)
