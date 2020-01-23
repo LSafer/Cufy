@@ -46,7 +46,7 @@ public abstract class Converter extends Invoke {
 	 * @throws NullPointerException     if the 'productClass' is null
 	 */
 	@StaticMethod
-	public <T> T convert(Object source, Class<? super T> productClass) {
+	public <T> T convert(Object source, Class<T> productClass) {
 		return this.convert(source, productClass, null, null, false);
 	}
 	/**
@@ -64,7 +64,7 @@ public abstract class Converter extends Invoke {
 	 * @throws NullPointerException     if 'productClass' is null
 	 */
 	@StaticMethod
-	public <T> T convert(Object source, Class<? super T> productClass, ConvertPosition position, Class<?> sourceClass, boolean clone) {
+	public <T> T convert(Object source, Class<T> productClass, ConvertPosition position, Class<?> sourceClass, boolean clone) {
 		Objects.requireNonNull(productClass, "productClass");
 
 		if (position == null)

@@ -31,7 +31,7 @@ public interface Convertible<T extends Convertible<T>> {
 	 * @throws ClassConversionException on casting/converting failure
 	 * @throws NullPointerException     if the given class is null
 	 */
-	default <U> U as(Class<? super U> klass) {
+	default <U> U as(Class<U> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.converter().convert(this, klass, null, null, false);
 	}
@@ -45,10 +45,11 @@ public interface Convertible<T extends Convertible<T>> {
 	 * @throws NullPointerException     if the given class is null
 	 * @throws ClassConversionException on converting failure
 	 */
-	default <U> U duplicate(Class<? super U> klass) {
+	default <U> U duplicate(Class<U> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.converter().convert(this, klass, null, null, true);
 	}
+
 	/**
 	 * Clone this class into a new instance of the class of this.
 	 *
