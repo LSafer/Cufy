@@ -12,26 +12,28 @@ package cufy.beans;
 import cufy.util.Array$;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Predicate;
 
 /**
- * A group of methods. Containing list of methods. And a map for those methods.
+ * A group of methods. Containing list of methods. And a map for the resolved sub-method-groups.
  *
  * @author LSaferSE
- * @version 2 alpha (18-Jan-2020)
+ * @version 3 release (23-Jan-2020)
  * @since 05-Dec-2019
  */
 public class MethodGroup extends AbstractSet<Method> {
 	/**
-	 * Method Mappings.
+	 * Sub-method-groups Mappings.
 	 */
-	final protected Map<Object, MethodGroup> groups = new HashMap<>(10);
+	final protected Map<Object, MethodGroup> groups = new HashMap<>(5);
 	/**
-	 * Method collection.
+	 * The methods stored at this group.
 	 *
-	 * @implSpec final elements
+	 * @implSpec don't change any element
 	 */
 	final protected Method[] methods;
 
@@ -43,7 +45,9 @@ public class MethodGroup extends AbstractSet<Method> {
 	 */
 	public MethodGroup(Collection<Method> methods) {
 		Objects.requireNonNull(methods, "methods");
-		methods.forEach(Objects::requireNonNull);
+		for (Method method : methods)
+			Objects.requireNonNull(method, "methods[?]");
+
 		this.methods = methods.toArray(new Method[0]);
 	}
 
@@ -58,22 +62,22 @@ public class MethodGroup extends AbstractSet<Method> {
 	}
 
 	/**
-	 * Get the method stored at the specified index on this group.
+	 * Get the first method in this group. Or get null if this group is empty
 	 *
-	 * @param index to get the method of
-	 * @return the method stored at the specified index
+	 * @return the first method in this group. Or null if this group is empty
 	 */
-	public Method get(int index) {
-		return index >= this.methods.length ? null : this.methods[index];
+	public Method getMethod() {
+		return this.methods.length == 0 ? null : this.methods[0];
 	}
 
 	/**
 	 * Get a methods group by key. Or group a new one if not exist. Using the given predicate.
 	 *
 	 * @param key    group key
-	 * @param tester methods test to group methods if no group stored at the given key
+	 * @param tester methods tester. Used to group the methods. If no group stored at the given key
 	 * @return group for the params passed
 	 * @throws NullPointerException if the given 'test' is null
+	 * @apiNote once the targeted group declared. You can not change it
 	 */
 	public synchronized MethodGroup getMethodGroup(Object key, Predicate<Method> tester) {
 		Objects.requireNonNull(tester, "tester");
@@ -87,19 +91,22 @@ public class MethodGroup extends AbstractSet<Method> {
 			return new MethodGroup(methods);
 		});
 	}
-
 	/**
-	 * Get methods annotated with all of the given annotations.
+	 * Get all the methods on this group. The methods that have been annotated with all of the given annotations.
 	 *
-	 * @param annotations that the methods group should have
-	 * @return group with every method annotated with all of the given annotations
-	 * @throws NullPointerException if the given annotation array is null
+	 * @param annotations that the methods on the returned group should have
+	 * @return a method group from this. With every method on it annotated with all of the given annotations
+	 * @throws NullPointerException     if the given 'annotation' (or any element on it) is null.
+	 * @throws IllegalArgumentException if any of the given annotations is not a runtime annotation
 	 */
 	public MethodGroup getMethodGroup(Class<? extends Annotation>... annotations) {
 		Objects.requireNonNull(annotations, "annotations");
 		return this.getMethodGroup(Arrays.asList(annotations), method -> {
 			for (Class<? extends Annotation> annotation : annotations) {
-				Objects.requireNonNull(annotation, "annotation");
+				Objects.requireNonNull(annotation, "annotations[?]");
+				Retention retention = annotation.getAnnotation(Retention.class);
+				if (retention == null || retention.value() != RetentionPolicy.RUNTIME)
+					throw new IllegalArgumentException(annotation + " is not a runtime annotation");
 
 				if (!method.isAnnotationPresent(annotation))
 					return false;

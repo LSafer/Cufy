@@ -20,28 +20,30 @@ import java.util.List;
  * implementing this.
  *
  * @author LSaferSE
- * @version 4 alpha (18-Jan-2020)
- * @apiNote this class not designed to be the direct super for the collection container
+ * @version 5 release (23-Jan-2020)
+ * @apiNote this class is not designed to be the direct super for the method collection container
  * @since 20-Nov-2019
  */
 public abstract class Invoke {
 	/**
-	 * Whether this class is in debugging mode or not.
+	 * Whether this class is in debugging mode or not. For better performance. Null checks and type compat tests should not be done on dynamic methods
+	 * except while debugging.
 	 *
-	 * Enables null checks and compat tests.
+	 * @implSpec enables null checks and compat tests.
 	 */
 	protected boolean DEBUGGING;
 
 	/**
-	 * All methods in this class.
+	 * The root method collection in this class.
+	 *
+	 * @implSpec all the methods. except static-methods
 	 */
 	protected MethodGroup methods;
 
 	/**
-	 * Get the main group of this. (the group with null key)
+	 * Get all the dynamic methods in this class.
 	 *
-	 * @return all methods group
-	 * @see Reflect$ #getAllMethods(Class)
+	 * @return all the dynamic methods in this class
 	 */
 	@StaticMethod
 	protected synchronized MethodGroup getMethods() {

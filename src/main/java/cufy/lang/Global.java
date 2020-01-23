@@ -28,7 +28,7 @@ public interface Global {
 	 * @param <G>   the type of the class
 	 * @return the global instance of the given class
 	 * @throws NullPointerException     if the given class is null
-	 * @throws IllegalArgumentException if this class isn't assignable from the given class.
+	 * @throws IllegalArgumentException if {@link Global} class isn't assignable from the given class.
 	 * @throws NoSuchFieldError         if the given class don't have a static field with the name "global"
 	 * @throws IllegalAccessError       if the global instance's field of the given class can't be accessed.
 	 */

@@ -8,7 +8,6 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-
 package cufy.lang;
 
 /**
@@ -18,7 +17,6 @@ package cufy.lang;
  * @version 1
  * @since 09-Dec-2019
  */
-@SuppressWarnings("NewClassNamingConvention")
 public class BadAnnotationException extends RuntimeException {
 	/**
 	 * Constructs a new bad annotation exception with null as its detail message. The cause is not initialized, and may subsequently be initialized by
@@ -26,7 +24,6 @@ public class BadAnnotationException extends RuntimeException {
 	 */
 	public BadAnnotationException() {
 	}
-
 	/**
 	 * Constructs a new bad annotation exception with the specified detail message. The cause is not initialized, and may subsequently be initialized
 	 * by a call to Throwable.initCause(java.lang.Throwable).
@@ -36,7 +33,6 @@ public class BadAnnotationException extends RuntimeException {
 	public BadAnnotationException(String message) {
 		super(message);
 	}
-
 	/**
 	 * Constructs a new bad annotation exception with the specified detail message and cause. Note that the detail message associated with cause is
 	 * not automatically incorporated in this bad annotation exception's detail message.
@@ -48,7 +44,6 @@ public class BadAnnotationException extends RuntimeException {
 	public BadAnnotationException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
 	/**
 	 * Constructs a new bad annotation exception with the specified cause and a detail message of (cause==null ? null : cause.toString()) (which
 	 * typically contains the class and detail message of cause). This constructor is useful for bad annotation exceptions that are little more than
@@ -60,7 +55,6 @@ public class BadAnnotationException extends RuntimeException {
 	public BadAnnotationException(Throwable cause) {
 		super(cause);
 	}
-
 	/**
 	 * Constructs a new bad annotation exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace
 	 * enabled or disabled.

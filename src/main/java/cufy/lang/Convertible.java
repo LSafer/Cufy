@@ -15,23 +15,23 @@ import java.util.Objects;
 /**
  * Defines that the implement class is a {@link Converter} user. Added more methods to direct use the {@link Converter}.
  *
+ * @param <T> the type of this
  * @author LSaferSE
- * @version 4 beta (18-Jan-2020)
+ * @version 5 release (23-Jan-2020)
  * @since 31-Aug-19
  */
-public interface Convertible {
+public interface Convertible<T extends Convertible<T>> {
 	/**
 	 * Cast this instance to the given class. And if this isn't instance of the given class then make a new instance of the given class with data of
-	 * this. By using the caster of this
+	 * this. By using the {@link Converter} {@link #converter() of this}.
 	 *
 	 * @param klass to be casted to
-	 * @param <T>   the type of the returned instance
-	 * @return this casted to the given class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
+	 * @param <U>   the type of the returned instance
+	 * @return this. Casted/Converted to the given class
+	 * @throws ClassConversionException on casting/converting failure
 	 * @throws NullPointerException     if the given class is null
 	 */
-	default <T> T as(Class<? super T> klass) {
+	default <U> U as(Class<? super U> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.converter().convert(this, klass, null, null, false);
 	}
@@ -40,15 +40,23 @@ public interface Convertible {
 	 * Clone this class into a new instance of the given class.
 	 *
 	 * @param klass to get a new instance of
-	 * @param <T>   type of the new clone
+	 * @param <U>   type of the new clone
 	 * @return a new clone casted from this to the given class
 	 * @throws NullPointerException     if the given class is null
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
+	 * @throws ClassConversionException on converting failure
 	 */
-	default <T> T clone(Class<? super T> klass) {
+	default <U> U duplicate(Class<? super U> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.converter().convert(this, klass, null, null, true);
+	}
+	/**
+	 * Clone this class into a new instance of the class of this.
+	 *
+	 * @return a new clone of this=
+	 * @throws ClassConversionException on cloning failure
+	 */
+	default T duplicate() {
+		return this.converter().convert(this, this.getClass(), null, null, true);
 	}
 
 	/**

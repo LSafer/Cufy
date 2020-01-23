@@ -15,15 +15,16 @@ package cufy.text;
  * appropriate type.
  *
  * @author LSaferSE
- * @version 2 release (26-Nov-2019)
+ * @version 3 release (23-Jan-2020)
  * @since 18-Nov-2019
  */
 public class FormatException extends RuntimeException {
 	/**
-	 * The object that have causes the exception while formatting it.
+	 * Constructs a new exception with null as its detail message. The cause is not initialized, and may subsequently be initialized by a call to
+	 * Throwable.initCause(java.lang.Throwable).
 	 */
-	protected Object object;
-
+	public FormatException() {
+	}
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -32,7 +33,6 @@ public class FormatException extends RuntimeException {
 	public FormatException(String msg) {
 		super(msg);
 	}
-
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -41,7 +41,6 @@ public class FormatException extends RuntimeException {
 	public FormatException(Throwable cause) {
 		super(cause);
 	}
-
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -51,47 +50,16 @@ public class FormatException extends RuntimeException {
 	public FormatException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
-
 	/**
-	 * Constructs a new exception with the specified arguments.
+	 * Constructs a new exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace enabled or
+	 * disabled.
 	 *
-	 * @param msg    the message
-	 * @param object the object caused the exception while formatting it
+	 * @param message            the detail message.
+	 * @param cause              the cause. (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+	 * @param enableSuppression  whether or not suppression is enabled or disabled
+	 * @param writableStackTrace whether or not the stack trace should be writable
 	 */
-	public FormatException(String msg, Object object) {
-		super(msg + ": " + object);
-		this.object = object;
-	}
-
-	/**
-	 * Constructs a new exception with the specified arguments.
-	 *
-	 * @param cause  the cause
-	 * @param object the object caused the exception while formatting it
-	 */
-	public FormatException(Throwable cause, Object object) {
-		super(cause);
-		this.object = object;
-	}
-
-	/**
-	 * Constructs a new exception with the specified arguments.
-	 *
-	 * @param msg    the message
-	 * @param cause  the cause
-	 * @param object the object caused the exception while formatting it
-	 */
-	public FormatException(String msg, Throwable cause, Object object) {
-		super(msg + ": " + object, cause);
-		this.object = object;
-	}
-
-	/**
-	 * Get the object that have causes the exception while formatting it.
-	 *
-	 * @return the cause object.
-	 */
-	public Object getObject() {
-		return this.object;
+	protected FormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

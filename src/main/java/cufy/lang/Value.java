@@ -18,7 +18,7 @@ import java.util.Objects;
  * A value with a type the annotations don't support.
  *
  * @author LSaferSE
- * @version 2 release (25-Nov-2019)
+ * @version 3 release (23-Jan-2020)
  * @since 21-Nov-2019
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -80,7 +80,6 @@ public @interface Value {
 				throw new BadAnnotationException("Can't construct " + value.getClass() + ": " + t.getMessage(), t);
 			}
 		}
-
 		/**
 		 * Build the given typed value. And make sure that it matches the given class.
 		 *
@@ -97,7 +96,9 @@ public @interface Value {
 
 			try {
 				return expected.cast(construct(value));
-			} catch (ClassCastException e) {
+			} catch (BadAnnotationException e) {
+				throw e;
+			} catch (Throwable e) {
 				throw new BadAnnotationException("Can't construct " + value.getClass() + ": " + e.getMessage(), e);
 			}
 		}

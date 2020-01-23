@@ -18,7 +18,7 @@ import java.util.Objects;
  * Class ranging annotation. A way to specify a range of classes.
  *
  * @author LSaferSE
- * @version 2 release (25-Nov-2019)
+ * @version 3 release (23-Jan-2020)
  * @since 21-Nov-2019
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -30,6 +30,7 @@ public @interface Type {
 	 * @apiNote this overrides {@link #subout()}
 	 */
 	Class<?>[] in() default {};
+
 	/**
 	 * Classes out range (subclasses NOT included).
 	 *
@@ -37,12 +38,14 @@ public @interface Type {
 	 * @apiNote this will override {@link #in()}, {@link #subin()}
 	 */
 	Class<?>[] out() default {};
+
 	/**
 	 * Classes in range (subclasses included).
 	 *
 	 * @return super classes in range
 	 */
 	Class<?>[] subin() default {};
+
 	/**
 	 * Classes not in range (subclasses included).
 	 *
@@ -50,6 +53,7 @@ public @interface Type {
 	 * @apiNote this will override {@link #subin()}
 	 */
 	Class<?>[] subout() default {};
+
 	/**
 	 * Works just like {@link #in()}.
 	 *

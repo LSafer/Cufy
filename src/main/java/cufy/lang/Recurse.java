@@ -11,11 +11,17 @@
 package cufy.lang;
 
 /**
- * A class/instance represent a recursive value.
+ * The Void class is an uninstantiable class representing a recursion.
  *
  * @author LSaferSE
  * @version 1 release (25-Nov-2019)
  * @since 25-Nov-2019
  */
-public interface Recurse {
+final public class Recurse {
+	/**
+	 * This is a representation class and should not be instanced.
+	 */
+	private Recurse() {
+		throw new AssertionError("No instance for you!");
+	}
 }

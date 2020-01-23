@@ -14,15 +14,16 @@ package cufy.text;
  * Thrown to indicate that the application has attempted to convert a string to an object, but that string does not have the appropriate type.
  *
  * @author LSaferSE
- * @version 2 release (26-Nov-2019)
+ * @version 3 release (23-Jan-2020)
  * @since 16-Nov-2019
  */
 public class ParseException extends RuntimeException {
 	/**
-	 * The string that have causes the exception while parsing it.
+	 * Constructs a new exception with null as its detail message. The cause is not initialized, and may subsequently be initialized by a call to
+	 * Throwable.initCause(java.lang.Throwable).
 	 */
-	protected CharSequence sequence;
-
+	public ParseException() {
+	}
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -31,7 +32,6 @@ public class ParseException extends RuntimeException {
 	public ParseException(String msg) {
 		super(msg);
 	}
-
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -40,7 +40,6 @@ public class ParseException extends RuntimeException {
 	public ParseException(Throwable cause) {
 		super(cause);
 	}
-
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -50,47 +49,16 @@ public class ParseException extends RuntimeException {
 	public ParseException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
-
 	/**
-	 * Constructs a new exception with the specified arguments.
+	 * Constructs a new exception exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace
+	 * enabled or disabled.
 	 *
-	 * @param msg      the message9
-	 * @param sequence the string caused the exception while parsing it
+	 * @param message            the detail message.
+	 * @param cause              the cause. (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+	 * @param enableSuppression  whether or not suppression is enabled or disabled
+	 * @param writableStackTrace whether or not the stack trace should be writable
 	 */
-	public ParseException(String msg, CharSequence sequence) {
-		super(msg + ": " + sequence);
-		this.sequence = sequence;
-	}
-
-	/**
-	 * Constructs a new exception with the specified arguments.
-	 *
-	 * @param cause    the cause
-	 * @param sequence the string caused the exception while parsing it
-	 */
-	public ParseException(Throwable cause, CharSequence sequence) {
-		super(cause);
-		this.sequence = sequence;
-	}
-
-	/**
-	 * Constructs a new exception with the specified arguments.
-	 *
-	 * @param msg      the message
-	 * @param cause    the cause
-	 * @param sequence the string caused the exception while parsing it
-	 */
-	public ParseException(String msg, Exception cause, CharSequence sequence) {
-		super(msg + ": " + sequence, cause);
-		this.sequence = sequence;
-	}
-
-	/**
-	 * Get the string that have causes the exception while parsing it.
-	 *
-	 * @return the string that have causes the exception while parsing it.
-	 */
-	public CharSequence getSequence() {
-		return this.sequence;
+	protected ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

@@ -26,16 +26,15 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * An abstract for text formatting classes. Used to simplify the formatter and make it more inheritable. Also make inheriting just for add some
- * futures more easier. This uses the {@link Invoke} class and methods in this will be invoked using the dynamic method grouping algorithm. In order
- * to add a method on a dynamic method group. the method should be annotated with the group annotation. (see {@link Invoke}). Also the method should
- * match the conditions of that group to avoid parameters/output mismatches. This abstract have three methods group {@link ClassifyMethod}, {@link
- * ParseMethod} and {@link FormatMethod}. each of them have their own conditions.
+ * An abstract class for text formatting classes. Used to simplify the formatter and make it more inheritable. lso making the inheriting for adding
+ * some futures more easier. This uses the {@link Invoke} class. And the methods in this will be invoked using the dynamic method grouping algorithm.
+ * In order to add a method on a dynamic method group. The method should be annotated with that group annotation. (see {@link Invoke}). Also the
+ * method should match the conditions of that group to avoid parameters/output mismatches. This abstract have three methods group {@link
+ * ClassifyMethod}, {@link ParseMethod} and {@link FormatMethod}. And each of them have it's own conditions.
  *
  * @author LSaferSE
- * @version 6 release (12-Dec-2019)
- * @implNote you have to navigate this class to where your {@link FormatMethod}, {@link ClassifyMethod} and {@link ParseMethod} methods is. By using
- * the mentioned annotations.
+ * @version 7 release (23-Jan-2020)
+ * @implNote you have to navigate this class to where your dynamic methods is. By using annotations.
  * @since 28-Sep-19
  */
 public abstract class Format extends Invoke {
@@ -53,19 +52,17 @@ public abstract class Format extends Invoke {
 		Objects.requireNonNull(sequence, "sequence");
 
 		try {
-			return this.classify(new StringReader(String.valueOf(sequence)), null);
+			return this.classify(new StringReader(sequence.toString()), null);
 		} catch (IOException e) {
 			throw new IOError(e);
 		}
 	}
-
 	/**
-	 * Query what's the suitable class from the text given by the given 'reader'. Using all methods with {@link ClassifyMethod} on this formatter. Or
-	 * null if no classifier can classify it.
+	 * Query what's the suitable class from the text given by the given 'reader'. Using all methods with {@link ClassifyMethod} on this formatter.
 	 *
 	 * @param reader   to read the sequence from
 	 * @param position to classify depending on (null to create a new position)
-	 * @return the suitable class for the given string. Or null if unknown.
+	 * @return the suitable class for the given string.
 	 * @throws ParseException       when any classifying error occurs
 	 * @throws IOException          if any I/O exception occurs
 	 * @throws NullPointerException if the given reader is null
@@ -81,7 +78,6 @@ public abstract class Format extends Invoke {
 		for (Method method : this.getClassifyMethods())
 			if (this.classify0(method, reader, position))
 				return method.getAnnotation(ClassifyMethod.class).value();
-
 		return this.classifyElse(reader, position);
 	}
 
@@ -105,9 +101,8 @@ public abstract class Format extends Invoke {
 
 		return writer.toString();
 	}
-
 	/**
-	 * Format the given object. Writing it to the given writer. Using the first method annotated with {@link FormatMethod}. And that annotation allows
+	 * Format the given object. Writing it to the given writer. Using the first method that have been annotated with {@link FormatMethod}. And allows
 	 * the given class. (methods are ordered randomly).
 	 *
 	 * @param object   the object ot be formatted
@@ -158,13 +153,12 @@ public abstract class Format extends Invoke {
 
 		return buffer.get();
 	}
-
 	/**
-	 * Parse the given sequence to an object. Storing that object to the given buffer. Using the first method annotated with {@link ParseMethod}. And
-	 * that annotation allows the given class. (methods are ordered randomly).
+	 * Parse the given sequence to an object. Then store that object to the given buffer. Using the first method that have been annotated with {@link
+	 * ParseMethod}. And allows the given class. (methods are ordered randomly).
 	 *
 	 * @param reader   to read the sequence form
-	 * @param buffer   to store the parsed object to while parsing
+	 * @param buffer   to store the parsed object to. While parsing
 	 * @param position to parse the given sequence depending on (null to create a new one)
 	 * @param klass    the targeted method output type (null for classifying the given sequence dynamically)
 	 * @throws ParseException       when any parsing error occurs
@@ -190,7 +184,7 @@ public abstract class Format extends Invoke {
 	}
 
 	/**
-	 * Invoke the given classify method with the given parameters.
+	 * Invoke the given {@link ClassifyMethod} with the given parameters.
 	 *
 	 * @param method   to be invoked
 	 * @param reader   to read the sequence from
@@ -235,7 +229,6 @@ public abstract class Format extends Invoke {
 			}
 		}
 	}
-
 	/**
 	 * Classify the string given by the given reader when no classifying method returned true to it.
 	 *
@@ -258,14 +251,14 @@ public abstract class Format extends Invoke {
 	}
 
 	/**
-	 * Invoke the given format method with the given parameters.
+	 * Invoke the given {@link FormatMethod} with the given parameters.
 	 *
 	 * @param method   to be invoked
 	 * @param object   the object ot be formatted
 	 * @param writer   to write the text to
 	 * @param position to format depending on
 	 * @throws FormatException          when any formatting errors occurs
-	 * @throws NullPointerException     if any argument given is null
+	 * @throws NullPointerException     if any argument given is null (except 'object')
 	 * @throws IOException              if any I/O exception occurs
 	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
 	 */
@@ -307,18 +300,15 @@ public abstract class Format extends Invoke {
 			}
 		}
 	}
-
 	/**
-	 * Format the given unsupported type object. If no dynamic method can handle the object. This method will be invoked. This method shouldn't be
-	 * directly called.
+	 * Format the given object. If no dynamic method can handle the object. This method shouldn't be directly called.
 	 *
 	 * @param object   the unsupported object ot be formatted
 	 * @param writer   to write the text to
 	 * @param position to format depending ond
-	 * @throws FormatException          when any formatting errors occurs
-	 * @throws NullPointerException     if any param given is null
-	 * @throws IOException              if any I/O exception occurs
-	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
+	 * @throws FormatException      when any formatting errors occurs
+	 * @throws NullPointerException if any param given is null (except 'object')
+	 * @throws IOException          if any I/O exception occurs
 	 */
 	@StaticMethod
 	protected void formatElse(Writer writer, Object object, FormatPosition position) throws IOException {
@@ -331,15 +321,14 @@ public abstract class Format extends Invoke {
 	}
 
 	/**
-	 * Get the classify methods group.
+	 * Get the {@link ClassifyMethod} group.
 	 *
-	 * @return the classify methods group
+	 * @return the {@link ClassifyMethod} group
 	 */
 	@StaticMethod
 	protected MethodGroup getClassifyMethods() {
 		return this.getMethods().getMethodGroup(ClassifyMethod.class);
 	}
-
 	/**
 	 * Get the first formatter method that supports the given class as a parameter. (methods ordered randomly).
 	 *
@@ -351,9 +340,8 @@ public abstract class Format extends Invoke {
 	protected Method getFormatMethod(Class<?> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.getMethods().getMethodGroup(FormatMethod.class).getMethodGroup(klass, method ->
-				Type.util.test(method.getAnnotation(FormatMethod.class).value(), klass)).get(0);
+				Type.util.test(method.getAnnotation(FormatMethod.class).value(), klass)).getMethod();
 	}
-
 	/**
 	 * Get the first parser method that supports the given class as a parameter. (methods ordered randomly).
 	 *
@@ -365,7 +353,7 @@ public abstract class Format extends Invoke {
 	protected Method getParseMethod(Class<?> klass) {
 		Objects.requireNonNull(klass, "klass");
 		return this.getMethods().getMethodGroup(ParseMethod.class).getMethodGroup(klass, method ->
-				Type.util.test(method.getAnnotation(ParseMethod.class).value(), klass)).get(0);
+				Type.util.test(method.getAnnotation(ParseMethod.class).value(), klass)).getMethod();
 	}
 
 	/**
@@ -379,7 +367,6 @@ public abstract class Format extends Invoke {
 		return new FormatPosition() {
 		};
 	}
-
 	/**
 	 * Construct a new parsing position.
 	 *
@@ -443,9 +430,8 @@ public abstract class Format extends Invoke {
 			}
 		}
 	}
-
 	/**
-	 * Parse the given unclassifiable string. This method shouldn't be directly called.
+	 * Parse the given string on the given reader. If no method on this class can handle it. This method shouldn't be directly called.
 	 *
 	 * @param reader   to read the text from
 	 * @param buffer   to store the parsed object to while parsing
@@ -469,10 +455,7 @@ public abstract class Format extends Invoke {
 	/**
 	 * A position used by {@link Format} to manage nested formatting.
 	 *
-	 * @author LSaferSE
-	 * @version 1 release (26-Nov-2019)
-	 * @implSpec a point should have final values!
-	 * @since 19-Nov-2019
+	 * @implSpec the position should have final values!
 	 */
 	public interface FormatPosition {
 	}
@@ -480,10 +463,7 @@ public abstract class Format extends Invoke {
 	/**
 	 * A position used by {@link Format} to manage nested parsing.
 	 *
-	 * @author LSaferSE
-	 * @version 1 release (26-Nov-2019)
-	 * @implSpec a point should have final values!
-	 * @since 19-Nov-2019
+	 * @implSpec the position should have final values!
 	 */
 	public interface ParsePosition {
 	}
@@ -492,18 +472,14 @@ public abstract class Format extends Invoke {
 	 * Navigate the {@link Format} class that the annotated method is a string-type-detecting method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #classify0} rules
-	 * @see #classify(Reader, ParsePosition) parameterization
-	 * @see #getClassifyMethods grouping
-	 * @see #classify0 invokation
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	protected @interface ClassifyMethod {
 		/**
-		 * Tells what class the annotated method is looking for. This will direct to the method with the same {@link ParseMethod#value()} as this
-		 * value.
+		 * Tells what class is the annotated method is checking the input for.
 		 *
-		 * @return the class the annotated method is looking for
+		 * @return the class that the annotated method is checking the input for
 		 */
 		Class<?> value();
 	}
@@ -512,17 +488,14 @@ public abstract class Format extends Invoke {
 	 * Navigate the {@link Format} class that the annotated method is a stringing method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #format0} rules
-	 * @see #format(Writer, Object, FormatPosition, Class) parameterization
-	 * @see #getFormatMethod grouping
-	 * @see #format0 invokation
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	protected @interface FormatMethod {
 		/**
-		 * Classes that the annotated method dose or dose not support as a parameter.
+		 * Classes that the annotated method dose support as a parameter.
 		 *
-		 * @return the supported/unsupported classes
+		 * @return the supported classes
 		 */
 		Type value() default @Type;
 	}
@@ -531,70 +504,15 @@ public abstract class Format extends Invoke {
 	 * Navigate the {@link Format} class that the annotated method is a parsing method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #parse0} rules
-	 * @see #parse(AtomicReference, Reader, ParsePosition, Class) parameterization
-	 * @see #getParseMethod grouping
-	 * @see #parse0 invokation
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	protected @interface ParseMethod {
 		/**
-		 * This is the magnet value for the {@link ClassifyMethod}. The linked classify method should have the same {@link ClassifyMethod#value()} as
-		 * this value
+		 * Classes that the annotated method returns.
 		 *
-		 * @return the magnet values for the classify method
+		 * @return the classes that the annotated method returns
 		 */
 		Type value() default @Type;
 	}
 }
-//	/**
-//	 * Parse the given null text. Set the parsed object to the given buffer.
-//	 *
-//	 * @param reader   to read the text from
-//	 * @param buffer   to set the object to
-//	 * @param position to depend on
-//	 * @throws ParseException                when the parser can't handle the given string
-//	 * @throws NullPointerException          if any of the given parameters is null
-//	 * @throws UnsupportedOperationException if this method not supported by this format
-//	 * @throws IOException                   if any I/O exception occurs
-//	 */
-//	@StaticMethod
-//	protected void parseNull(Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
-//		Objects.requireNonNull(reader, "reader");
-//		Objects.requireNonNull(buffer, "buffer");
-//		Objects.requireNonNull(position, "position");
-//		buffer.set(null);
-//	}
-
-//
-//	/**
-//	 * Check if the given string should be parsed as null or not. This method shouldn't be directly called.
-//	 *
-//	 * @param reader   to read the string from
-//	 * @param position to check depending on
-//	 * @return whether the given string is null or not.
-//	 * @throws ParseException       if any parsing exception occurs
-//	 * @throws NullPointerException if the position given is null
-//	 * @throws IOException          if any I/O exception occurs
-//	 */
-//	@StaticMethod
-//	protected boolean isNull(Reader reader, ParsePosition position) throws IOException {
-//		Objects.requireNonNull(reader, "reader");
-//		Objects.requireNonNull(position, "position");
-//		return false;
-//	}
-
-//	/**
-//	 * Format the value 'null'. This method shouldn't be directly called.
-//	 *
-//	 * @param writer   to write the text to
-//	 * @param position to format depending on
-//	 * @throws FormatException               when any formatting errors occurs (Also if this method isn't supported by this formatter)
-//	 * @throws NullPointerException          if any argument given is null
-//	 * @throws UnsupportedOperationException if the method isn't supported by the format
-//	 * @throws IOException                   if any I/O exception occurs
-//	 */
-//	@StaticMethod
-//	protected void formatNull(Writer writer, FormatPosition position) throws IOException {
-//		throw new UnsupportedEncodingException();
-//	}
