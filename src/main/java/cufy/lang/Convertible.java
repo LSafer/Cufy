@@ -56,7 +56,7 @@ public interface Convertible<T extends Convertible<T>> {
 	 * @throws ClassConversionException on cloning failure
 	 */
 	default T duplicate() {
-		return this.converter().convert(this, this.getClass(), null, null, true);
+		return (T) this.converter().convert(this, this.getClass(), null, null, true);
 	}
 
 	/**

@@ -14,6 +14,8 @@ package cufy.beans;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -33,12 +35,15 @@ public class InvokeTest {
 			Assert.assertTrue("Not targeted", ((String) method.invoke(dynamic)).contains("work2"));
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
 	public @interface TestMethod0 {
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
 	public @interface TestMethod1 {
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
 	public @interface TestMethod2 {
 	}
 
@@ -62,7 +67,7 @@ public class InvokeTest {
 
 		@TestMethod0
 		protected String method0() {
-			return "work";
+			return "work0";
 		}
 
 		@TestMethod1
