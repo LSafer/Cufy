@@ -10,15 +10,14 @@
  */
 package cufy.lang;
 
-import cufy.util.ObjectUtil;
-
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * Global instance getter. For those classes that have a one global instance.
  *
  * @author LSaferSE
- * @version 2 release (26-Nov-2019)
+ * @version 3 release (18-Jan-2020)
  * @since 07-Nov-2019
  */
 public interface Global {
@@ -28,25 +27,35 @@ public interface Global {
 	 * @param klass to get the global instance of
 	 * @param <G>   the type of the class
 	 * @return the global instance of the given class
-	 * @throws RuntimeException     if the global instance is private. Or if no global instance found.
-	 * @throws NullPointerException if the given class is null
+	 * @throws NullPointerException     if the given class is null
+	 * @throws IllegalArgumentException if this class isn't assignable from the given class.
+	 * @throws NoSuchFieldError         if the given class don't have a static field with the name "global"
+	 * @throws IllegalAccessError       if the global instance's field of the given class can't be accessed.
 	 */
 	static <G> G get(Class<G> klass) {
-		ObjectUtil.requireNonNull(klass, "klass");
+		Objects.requireNonNull(klass, "klass");
 
-		if (Global.class.isAssignableFrom(klass))
+		if (!Global.class.isAssignableFrom(klass))
+			throw new IllegalArgumentException(Global.class + " can't be assignable from " + klass);
+
+		try {
+			Field field = klass.getField("global");
+			field.setAccessible(true);
+			return (G) field.get(null);
+		} catch (NoSuchFieldException e) {
 			try {
-				return (G) klass.getField("global").get(null);
-			} catch (IllegalAccessException | NoSuchFieldException e) {
-				try {
-					Field field = klass.getDeclaredField("global");
-					field.setAccessible(true);
-					return (G) field.get(null);
-				} catch (NoSuchFieldException | IllegalAccessException ex) {
-					throw new RuntimeException(ex);
-				}
+				Field field = klass.getDeclaredField("global");
+
+				field.setAccessible(true);
+				return (G) field.get(null);
+			} catch (NoSuchFieldException ex) {
+				throw (NoSuchFieldError) new NoSuchFieldError().initCause(ex);
+			} catch (IllegalAccessException ex) {
+				throw (IllegalAccessError) new IllegalAccessError().initCause(ex);
 			}
-		else throw new IllegalArgumentException(klass + " don't implement " + Global.class);
+		} catch (IllegalAccessException e) {
+			throw (IllegalAccessError) new IllegalAccessError().initCause(e);
+		}
 	}
 
 	/**
@@ -54,6 +63,8 @@ public interface Global {
 	 *
 	 * @param <G> the type of the class
 	 * @return the global instance of the class of this
+	 * @throws NoSuchFieldError   if the given class don't have a static field with the name "global"
+	 * @throws IllegalAccessError if the global instance's field of the given class can't be accessed.
 	 */
 	default <G extends Global> G global() {
 		return (G) Global.get(this.getClass());

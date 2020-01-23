@@ -10,8 +10,6 @@
  */
 package cufy.text;
 
-import cufy.util.StringUtil;
-
 /**
  * Thrown to indicate that the application has attempted to convert an object to a string (or string to object), but that object does not have the
  * appropriate type.
@@ -61,7 +59,7 @@ public class FormatException extends RuntimeException {
 	 * @param object the object caused the exception while formatting it
 	 */
 	public FormatException(String msg, Object object) {
-		super(msg + ": " + StringUtil.logging(object));
+		super(msg + ": " + object);
 		this.object = object;
 	}
 
@@ -84,7 +82,7 @@ public class FormatException extends RuntimeException {
 	 * @param object the object caused the exception while formatting it
 	 */
 	public FormatException(String msg, Throwable cause, Object object) {
-		super(msg + ": " + StringUtil.logging(object), cause);
+		super(msg + ": " + object, cause);
 		this.object = object;
 	}
 

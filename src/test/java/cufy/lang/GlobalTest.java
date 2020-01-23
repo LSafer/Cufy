@@ -11,7 +11,6 @@
 
 package cufy.lang;
 
-import org.cufy.lang.BaseConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,6 +18,10 @@ import org.junit.Test;
 public class GlobalTest {
 	@Test(timeout = 50)
 	public void get() {
-		Assert.assertSame("Wrong instance", Global.get(BaseConverter.class), BaseConverter.global);
+		Assert.assertSame("Wrong instance", Global.get(TestGlobal.class), TestGlobal.global);
+	}
+
+	public static class TestGlobal implements Global {
+		final private static TestGlobal global = new TestGlobal();
 	}
 }

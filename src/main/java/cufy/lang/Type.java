@@ -10,10 +10,9 @@
  */
 package cufy.lang;
 
-import cufy.util.ObjectUtil;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 /**
  * Class ranging annotation. A way to specify a range of classes.
@@ -31,7 +30,6 @@ public @interface Type {
 	 * @apiNote this overrides {@link #subout()}
 	 */
 	Class<?>[] in() default {};
-
 	/**
 	 * Classes out range (subclasses NOT included).
 	 *
@@ -39,14 +37,12 @@ public @interface Type {
 	 * @apiNote this will override {@link #in()}, {@link #subin()}
 	 */
 	Class<?>[] out() default {};
-
 	/**
 	 * Classes in range (subclasses included).
 	 *
 	 * @return super classes in range
 	 */
 	Class<?>[] subin() default {};
-
 	/**
 	 * Classes not in range (subclasses included).
 	 *
@@ -54,6 +50,12 @@ public @interface Type {
 	 * @apiNote this will override {@link #subin()}
 	 */
 	Class<?>[] subout() default {};
+	/**
+	 * Works just like {@link #in()}.
+	 *
+	 * @return absolute classes in range
+	 */
+	Class<?>[] value() default {};
 
 	/**
 	 * Tools for this annotation. (aka static methods).
@@ -62,20 +64,24 @@ public @interface Type {
 		/**
 		 * Check whether the given class is in the given range or not.
 		 *
-		 * @param type to check if the class is in
+		 * @param type  to check if the class is in
 		 * @param klass to be checked
 		 * @return whether the given class is in the given range or not
 		 * @throws NullPointerException if ether the given range or class is null
 		 */
 		public static boolean test(Type type, Class<?> klass) {
-			ObjectUtil.requireNonNull(type, "range");
-			ObjectUtil.requireNonNull(klass, "klass");
+			Objects.requireNonNull(type, "type");
+			Objects.requireNonNull(klass, "klass");
 
 			for (Class<?> exclude : type.out())
 				if (exclude == klass)
 					return false;
 
 			for (Class<?> include : type.in())
+				if (include == klass)
+					return true;
+
+			for (Class<?> include : type.value())
 				if (include == klass)
 					return true;
 

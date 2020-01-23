@@ -46,8 +46,8 @@ public class JSONTest {
 		Map<String, Map<String, List<Number>>> val = (Map<String, Map<String, List<Number>>>) JSON.global.parse("{\"map\":{\"number\":[9, 3, 5]}}");
 		Map<String, List<Number>> map = val.get("map");
 		List<Number> number = map.get("number");
-		Assert.assertEquals(9L, number.get(0).longValue());
-		Assert.assertEquals(3L, number.get(1).longValue());
-		Assert.assertEquals(5L, number.get(2).longValue());
+		Assert.assertEquals("first number not detected", 9L, number.get(0).longValue());
+		Assert.assertEquals("second number not detected", 3L, number.get(1).longValue());
+		Assert.assertEquals("third number not detected", 5L, number.get(2).longValue());
 	}
 }

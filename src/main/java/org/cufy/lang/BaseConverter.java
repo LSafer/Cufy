@@ -10,81 +10,23 @@
  */
 package org.cufy.lang;
 
+import cufy.beans.StaticMethod;
 import cufy.lang.Converter;
 import cufy.lang.Global;
 import cufy.lang.Recurse;
 import cufy.lang.Type;
-import cufy.util.CollectionUtil;
-import cufy.util.ObjectUtil;
-import cufy.util.StringUtil;
-import org.cufy.text.JSON;
+import cufy.util.Array$;
+import cufy.util.Reflect$;
 
 import java.io.File;
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- * Default casting engine.
- *
- * <ul>
- *     <font color="orange" size="4"><b>Dynamic Methods:</b></font>
- *     <li>
- *         <font color="yellow">{@link Collection}</font>
- *         <ul>
- *             <li>{@link #collection2array}</li>
- *             <li>{@link #collection2collection}</li>
- *             <li>{@link #collection2map}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link File}</font>
- *         <ul>
- *             <li>{@link #file2file}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link Map}</font>
- *         <ul>
- *             <li>{@link #map2array}</li>
- *             <li>{@link #map2collection}</li>
- *             <li>{@link #map2list}</li>
- *             <li>{@link #map2map}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link Number}</font>
- *         <ul>
- *             <li>{@link #number2byte}</li>
- *             <li>{@link #number2double}</li>
- *             <li>{@link #number2float}</li>
- *             <li>{@link #number2integer}</li>
- *             <li>{@link #number2long}</li>
- *             <li>{@link #number2short}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link Object}</font>
- *         <ul>
- *             <li>{@link #object2string}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link Recurse}</font>
- *         <ul>
- *             <li>{@link #recurse2object}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link CharSequence}</font>
- *         <ul>
- *             <li>{@link #sequence2object}</li>
- *         </ul>
- *     </li>
- * </ul>
+ * Base {@link Converter}.
  *
  * @author LSaferSE
- * @version 3 release (26-Nov-2019)
+ * @version 4 release (23-Jan-2020)
  * @since 31-Aug-19
  */
 public class BaseConverter extends Converter implements Global {
@@ -93,6 +35,10 @@ public class BaseConverter extends Converter implements Global {
 	 */
 	final public static BaseConverter global = new BaseConverter();
 
+	{
+		DEBUGGING = false;
+	}
+
 	@StaticMethod
 	@Override
 	protected BaseConvertPosition newConvertPosition() {
@@ -100,22 +46,24 @@ public class BaseConverter extends Converter implements Global {
 	}
 
 	/**
-	 * Get an array with the type of the given class. With the value of the given {@link Collection}.
+	 * Construct a new array with a type of the given type. Then copy all the elements from the given 'source' to the constructed array. And convert
+	 * all elements after reading it from the 'source' to match the 'productClass' using this converter.
 	 *
-	 * @param collection to get the value from
-	 * @param out        the class of the targeted array
-	 * @param position   the position to depend on
-	 * @param <T>        the targeted type
-	 * @return the value of the given collection on an array of the given class
+	 * @param source       to copy data from
+	 * @param productClass the class of the product array
+	 * @param position     to depend on while copping (hunting recursion for example)
+	 * @return a new array with the type given. Holds all the elements from the given array. Converted to match the type of the new array
+	 * @throws NullPointerException     if any of the given parameters is null
+	 * @throws IllegalArgumentException if the given 'source' isn't an array. Or if the given 'productClass' is not a class for arrays.
 	 */
 	@ConvertMethod(in = @Type(subin = {
-			Collection.class,
 			Object[].class,
 			boolean[].class,
 			byte[].class,
 			char[].class,
 			double[].class,
 			float[].class,
+			int[].class,
 			long[].class,
 			short[].class
 	}), out = @Type(subin = {
@@ -125,336 +73,584 @@ public class BaseConverter extends Converter implements Global {
 			char[].class,
 			double[].class,
 			float[].class,
+			int[].class,
 			long[].class,
 			short[].class
 	}))
-	protected <T> T collection2array(Object collection, Class<? super T> out, BaseConvertPosition position) {
-		Collection<?> elements = CollectionUtil.from(collection);
+	protected Object arrayToArray(Object source, Class<?> productClass, BaseConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+			if (!source.getClass().isArray())
+				throw new IllegalArgumentException(source + " is not an array");
+			if (!productClass.isArray())
+				throw new IllegalArgumentException(productClass + " is not a class for arrays");
+		}
 
-		Class<?> type = out.getComponentType();
-		T array = (T) Array.newInstance(type, elements.size());
+		Class<?> productComponentType = productClass.getComponentType();
+		int length = Array.getLength(source);
+		Object product = Array.newInstance(productComponentType, length);
+
+		//Casting foreach element
+		for (int i = 0; i < length; i++) {
+			Object element = Array.get(source, i);
+			element = position.convert(element, productComponentType, null, null, false, source, product);
+			Array.set(product, i, element);
+		}
+
+		return product;
+	}
+
+	/**
+	 * Construct a new collection with the type of the given type. Then copy all elements from the given 'source' to the constructed collection.
+	 *
+	 * @param source       to get the value from
+	 * @param productClass the class of the targeted collection
+	 * @return the value of the given source on a collection of the given class
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given 'source' is not an array. Or if the given 'productClass' is not a class for collections
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
+	 */
+	@ConvertMethod(in = @Type(subin = {
+			Object[].class,
+			boolean[].class,
+			byte[].class,
+			char[].class,
+			double[].class,
+			int[].class,
+			float[].class,
+			long[].class,
+			short[].class,
+	}), out = @Type(subin = Collection.class))
+	protected Collection arrayToCollection(Object source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!source.getClass().isArray())
+				throw new IllegalArgumentException(source + " is not an array");
+			if (!Collection.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for collections");
+		}
+
+		List<?> list = Array$.asList0(source);
+
+		try {
+			return productClass.getConstructor(Collection.class).newInstance(list);
+		} catch (ReflectiveOperationException ignored) {
+		}
+
+		Collection<Object> product = productClass.getConstructor().newInstance();
+		product.addAll(list);
+		return product;
+	}
+
+	/**
+	 * Construct a new map of the given type. Then put every element from the given 'source' to the constructed map. Every element will be put to an
+	 * {@link Integer} key representing it's index on the 'source'.
+	 *
+	 * @param source       to get the value from
+	 * @param productClass the class of the map to construct
+	 * @return the value of the given array on a map of the given class
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given 'source' is not an array. Or if the given 'productClass' is not a class for maps.
+	 * @throws ReflectiveOperationException if any exception occurs while trying to construct the new map
+	 */
+	@ConvertMethod(in = @Type(subin = {
+			Object[].class,
+			boolean[].class,
+			byte[].class,
+			char[].class,
+			double[].class,
+			int[].class,
+			float[].class,
+			long[].class,
+			short[].class,
+	}), out = @Type(subin = Map.class))
+	protected Map arrayToMap(Object source, Class<? extends Map> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!source.getClass().isArray())
+				throw new IllegalArgumentException(source + " is not an array");
+			if (!Map.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for maps");
+		}
+
+		int length = Array.getLength(source);
+		Map<Object, Object> product = productClass.getConstructor().newInstance();
+
+		for (int i = 0; i < length; i++)
+			product.put(i, Array.get(source, i));
+
+		return product;
+	}
+
+	/**
+	 * Construct a new array with a type of the given class. Then copy all elements from the given 'source' to the constructed array. And convert *
+	 * all elements after reading it from the 'source' to match the 'productClass' using this converter.
+	 *
+	 * @param source       to copy data from
+	 * @param productClass the class of the product array
+	 * @param position     to depend on while copping (hunting recursion for example)
+	 * @return a new array with the type given. Holds all the elements from the given array. Converted to math the type of the new array
+	 * @throws NullPointerException     if any of the given parameters is null
+	 * @throws IllegalArgumentException if the given 'productClass' is not a class for arrays
+	 */
+	@SuppressWarnings("DuplicatedCode")
+	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = {
+			Object[].class,
+			boolean[].class,
+			byte[].class,
+			char[].class,
+			double[].class,
+			float[].class,
+			int[].class,
+			long[].class,
+			short[].class
+	}))
+	protected Object collectionToArray(Collection<?> source, Class<?> productClass, BaseConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+			if (!productClass.isArray())
+				throw new IllegalArgumentException(productClass + " is not a class for arrays");
+		}
+
+		Class<?> productComponentType = productClass.getComponentType();
+		Object product = Array.newInstance(productClass, source.size());
 
 		int i = 0;
-		for (Object element : elements)
-			Array.set(array, i++, position.convert(element, (Class<? super Object>) type, collection, array));
-
-		return array;
-	}
-
-	/**
-	 * Get a {@link Collection} with the type of the given class. With the value of the given {@link Collection}.
-	 *
-	 * @param collection to get the value from
-	 * @param out        the class of the targeted collection
-	 * @param position   the position to depend on
-	 * @param <C>        the targeted type
-	 * @return the value of the given collection on a collection of the given class
-	 */
-	@ConvertMethod(out = @Type(subin = Collection.class), in = @Type(subin = {
-			Collection.class,
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			long[].class,
-			short[].class
-	}))
-	protected <C extends Collection<?>> C collection2collection(Object collection, Class<? super C> out, BaseConvertPosition position) {
-		try {
-			Collection<?> elements = CollectionUtil.from(collection);
-			C collection1 = (C) out.getConstructor().newInstance();
-
-			int i;
-			for (Object element : elements)
-				collection1.add(position.convert(element, Object.class, collection, collection1));
-
-			return collection1;
-		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+		for (Object element : source) {
+			element = position.convert(element, productComponentType, null, null, false, source, product);
+			Array.set(product, i++, element);
 		}
+
+		return product;
 	}
 
 	/**
-	 * Get a {@link Map} with the type of the given class. With the value of the given {@link Collection}.
+	 * Construct a new collection with the type of the given type. Then copy all elements from the given 'source' to the constructed collection.
 	 *
-	 * @param collection to get the value from
-	 * @param out        the class of the targeted map
-	 * @param position   the position to depend on
-	 * @param <M>        the targeted type
+	 * @param source       to get the value from
+	 * @param productClass the class of the targeted collection
+	 * @return the value of the given source on a collection of the given class
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for collections
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
+	 */
+	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = Collection.class))
+	protected Collection collectionToCollection(Collection<?> source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!Collection.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for collections");
+		}
+
+		try {
+			return productClass.getConstructor(Collection.class).newInstance(source);
+		} catch (ReflectiveOperationException ignored) {
+		}
+
+		Collection<Object> product = productClass.getConstructor().newInstance();
+		product.addAll(source);
+		return product;
+	}
+
+	/**
+	 * Construct a new map of the given type. Then put every element from the given 'source' to the constructed map. Every element will be put to an
+	 * {@link Integer} key representing it's index on the 'source'.
+	 *
+	 * @param source       to get the value from
+	 * @param productClass the class of the map to construct
 	 * @return the value of the given collection on a map of the given class
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     or if the given 'productClass' is not a class for maps.
+	 * @throws ReflectiveOperationException if any exception occurs while trying to construct the new map
 	 */
-	@ConvertMethod(out = @Type(subin = Map.class), in = @Type(subin = {
-			Collection.class,
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			long[].class,
-			short[].class
-	}))
-	protected <M extends Map<?, ?>> M collection2map(Object collection, Class<? super M> out, BaseConvertPosition position) {
-		try {
-			Collection<?> elements = CollectionUtil.from(collection);
-			M map = (M) out.getConstructor().newInstance();
-
-			int i = 0;
-			for (Object element : elements)
-				((Map<Object, Object>) map).put(i++, position.convert(element, Object.class, collection, map));
-
-			return map;
-		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = Map.class))
+	protected Map collectionToMap(Collection<?> source, Class<? extends Map> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!Map.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for maps");
 		}
+
+		Map<Object, Object> map = productClass.getConstructor().newInstance();
+
+		int i = 0;
+		for (Object element : source)
+			map.put(i++, element);
+
+		return map;
 	}
 
 	/**
-	 * Get a {@link File} with the type of the given class. With the value of the given {@link File}.
+	 * Construct a file object of the given type. That represents the file that have been represented from the given 'source'.
 	 *
-	 * @param file     to get the value from
-	 * @param out      the class of the targeted file
-	 * @param position the position to depend on
-	 * @param <F>      the targeted type
+	 * @param source       to get the value from
+	 * @param productClass the class of the file to construct
 	 * @return the value of the given file on a file of the given class
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the new file
+	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for files
 	 */
 	@ConvertMethod(in = @Type(subin = File.class), out = @Type(subout = File.class))
-	protected <F extends File> F file2file(File file, Class<? super F> out, BaseConvertPosition position) {
-		try {
-			return (F) out.getConstructor(String.class).newInstance(file.toString());
-		} catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-			throw new RuntimeException(e);
+	protected File fileToFile(File source, Class<? extends File> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!File.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for files");
 		}
+
+		return productClass.getConstructor(String.class).newInstance(source.getAbsolutePath());
 	}
 
 	/**
-	 * Get a array with the type of the given class. With the value of the given {@link Map}.
+	 * Construct a new array with type of the given type. And copy elements from the given 'source' to that array. This method will copy element that
+	 * have been mapped to a non-negative {@link Integer} key only. Those keys will be used as Indexes for the elements they're pointing at. And the
+	 * indexes between will be filled with nulls.
 	 *
-	 * @param map      to get the value from
-	 * @param out      the class of the targeted array
-	 * @param position the position to depend on
-	 * @param <T>      the targeted type
+	 * @param source       to get the value from
+	 * @param productClass the class of the targeted array
+	 * @param position     the position to depend on
 	 * @return the value of the given map on a array of the given class
+	 * @throws NullPointerException     if any of the given parameters is null
+	 * @throws IllegalArgumentException if the given 'productClass' is not a class for arrays
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = {
 			Object[].class,
 			boolean[].class,
 			byte[].class,
 			char[].class,
 			double[].class,
+			int[].class,
 			float[].class,
 			long[].class,
-			short[].class
+			short[].class,
 	}))
-	protected <T> T map2array(Map<?, ?> map, Class<? super T> out, BaseConvertPosition position) {
-		return this.collection2array(this.map2list(map, ArrayList.class, position), out, position);
-	}
-
-	/**
-	 * Get a {@link Collection} with the type of the given class. With the value of the given {@link Map}.
-	 *
-	 * @param map      to get the value from
-	 * @param out      the class of the targeted collection
-	 * @param position the position to depend on
-	 * @param <C>      the targeted type
-	 * @return the value of the given map on a collection of the given class
-	 */
-	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Collection.class, out = List.class))
-	protected <C extends Collection<?>> C map2collection(Map<?, ?> map, Class<? super C> out, BaseConvertPosition position) {
-		try {
-			C collection = (C) out.getConstructor().newInstance();
-			((Collection<Object>) collection).addAll(map.values());
-			return collection;
-		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+	protected Object mapToArray(Map<?, ?> source, Class<?> productClass, BaseConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+			if (!productClass.isArray())
+				throw new IllegalArgumentException(productClass + " is not a class for arrays");
 		}
+
+		List<?> list;
+		try {
+			list = this.mapToList(source, ArrayList.class);
+		} catch (ReflectiveOperationException e) {
+			throw new Error("Should be able to construct a new ArrayList", e);
+		}
+		Class<?> productComponentType = productClass.getComponentType();
+		Object product = Array.newInstance(productComponentType, list.size());
+
+		int i = 0;
+		for (Object element : list) {
+			element = position.convert(element, productComponentType, null, null, false, source, product);
+			Array.set(product, i++, element);
+		}
+
+		return product;
 	}
 
 	/**
-	 * Get a {@link List} with the type of the given class. With the value of the given {@link Map}.
+	 * Construct a new collection with type of the given class. And fill it with values from the given 'source'.
 	 *
-	 * @param map      to get the value from
-	 * @param out      the class of the targeted list
-	 * @param position the position to depend on
-	 * @param <L>      the targeted type
+	 * @param source       to get data from
+	 * @param productClass the type of the collection to construct
+	 * @return a new collection with type of the given class. Filled with the data from the given source
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for maps
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
+	 */
+	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Collection.class, subout = List.class))
+	protected Collection mapToCollection(Map<?, ?> source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!Collection.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for collections");
+		}
+
+		try {
+			return productClass.getConstructor(Collection.class).newInstance(source.values());
+		} catch (ReflectiveOperationException ignored) {
+		}
+
+		Collection<Object> collection = productClass.getConstructor().newInstance();
+		collection.addAll(source.values());
+		return collection;
+	}
+
+	/**
+	 * Construct a new list with type of the given type. This method will copy element that have been mapped to a non-negative {@link Integer} key
+	 * only. Those keys will be used as Indexes for the elements they're pointing at. And the indexes between will be filled with nulls.
+	 *
+	 * @param source       to get data from
+	 * @param productClass the class of the targeted list
 	 * @return the value of the given map on a list of the given class
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product list
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for lists
 	 */
 	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = List.class))
-	protected <L extends List<?>> L map2list(Map<?, ?> map, Class<? super L> out, BaseConvertPosition position) {
-		try {
-			L list = (L) out.getConstructor().newInstance();
-
-			//noinspection Java8MapForEach value may not be used
-			map.entrySet().forEach(entry -> {
-				Object key = entry.getKey();
-
-				if (key instanceof Integer && (Integer) key > -1) {
-					if ((Integer) key >= list.size())
-						CollectionUtil.fill((List<Object>) list, (Integer) key + 1, i -> null);
-
-					((List<Object>) list).set((Integer) key, entry.getValue());
-				}
-			});
-
-			return list;
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+	protected List mapToList(Map<?, ?> source, Class<? extends List> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!List.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for lists");
 		}
+
+		List<Object> product = productClass.getConstructor().newInstance();
+
+		//noinspection Java8MapForEach
+		source.entrySet().forEach(entry -> {
+			Object key = entry.getKey();
+
+			if (key instanceof Integer && (Integer) key > -1) {
+				int i = (Integer) key;
+
+				while (i >= product.size()) {
+					product.add(null);
+				}
+
+				product.set(i, entry.getValue());
+			}
+		});
+
+		return product;
 	}
 
 	/**
-	 * Get a {@link Map} with the type of the given class. With the value of the given {@link Map}.
+	 * Construct a new map copping the value of the given 'source'.
 	 *
-	 * @param map      to get the value from
-	 * @param out      the class of the targeted map
-	 * @param position the position to depend on
-	 * @param <M>      the targeted type
-	 * @return the value of the given map on a map of the given class
+	 * @param source       to copy value from
+	 * @param productClass the class of the targeted map to be constructed
+	 * @return a map of the given type that holds the values of the given source
+	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product map
+	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for maps
+	 * @throws NullPointerException         if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Map.class))
-	protected <M extends Map<?, ?>> M map2map(Map<?, ?> map, Class<? super M> out, BaseConvertPosition position) {
-		try {
-			M instance = (M) out.getConstructor().newInstance();
-			((Map<Object, Object>) instance).putAll(map);
-			return instance;
-		} catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+	protected Map mapToMap(Map<?, ?> source, Class<? extends Map> productClass) throws ReflectiveOperationException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			if (!Map.class.isAssignableFrom(productClass))
+				throw new IllegalArgumentException(productClass + " is not a class for maps");
 		}
+
+		try {
+			return productClass.getConstructor(Map.class).newInstance(source);
+		} catch (ReflectiveOperationException ignored) {
+		}
+
+		Map<Object, Object> product = productClass.getConstructor().newInstance();
+		product.putAll(source);
+		return product;
+	}
+
+	/**
+	 * Returns null.
+	 *
+	 * @return null
+	 */
+	@ConvertMethod(in = @Type(subin = Void.class), out = @Type(subin = Object.class))
+	protected Object nullToObject() {
+		return null;
 	}
 
 	/**
 	 * Get a {@link Byte} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      byte class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as byte
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Byte.class, byte.class}))
-	protected Byte number2byte(Number number, Class<Byte> out, BaseConvertPosition position) {
-		return number.byteValue();
+	protected Byte numberToByte(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.byteValue();
 	}
 
 	/**
 	 * Get a {@link Double} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      double class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as double
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Double.class, double.class}))
-	protected Double number2double(Number number, Class<Double> out, BaseConvertPosition position) {
-		return number.doubleValue();
+	protected Double numberToDouble(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.doubleValue();
 	}
 
 	/**
 	 * Get a {@link Float} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      float class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as float
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Float.class, float.class}))
-	protected Float number2float(Number number, Class<Float> out, BaseConvertPosition position) {
-		return number.floatValue();
+	protected Float numberToFloat(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.floatValue();
 	}
 
 	/**
 	 * Get a {@link Integer} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      integer class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as integer
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Integer.class, int.class}))
-	protected Integer number2integer(Number number, Class<Integer> out, BaseConvertPosition position) {
-		return number.intValue();
+	protected Integer numberToInteger(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.intValue();
 	}
 
 	/**
 	 * Get a {@link Long} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      long class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as long
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Long.class, long.class}))
-	protected Long number2long(Number number, Class<Long> out, BaseConvertPosition position) {
-		return number.longValue();
+	protected Long numberToLong(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.longValue();
 	}
 
 	/**
 	 * Get a {@link Short} with the type of the given class. With the value of the given {@link Number}.
 	 *
-	 * @param number   to get the value from
-	 * @param out      short class
-	 * @param position the position to depend on
+	 * @param source to get the value from
 	 * @return the value of the given number as short
+	 * @throws NullPointerException if any of the given parameters is null
 	 */
 	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Short.class, short.class}))
-	protected Short number2short(Number number, Class<Short> out, BaseConvertPosition position) {
-		return number.shortValue();
+	protected Short numberToShort(Number source) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+		}
+
+		return source.shortValue();
 	}
 
 	/**
 	 * Returns the string representation of the Object argument.
 	 *
-	 * @param object   an Object.
-	 * @param out      string class
-	 * @param position the position to depend on
+	 * @param source an Object.
 	 * @return the string representation of the Object argument
 	 */
 	@ConvertMethod(in = @Type(subin = Object.class), out = @Type(in = String.class))
-	protected String object2string(Object object, Class<String> out, BaseConvertPosition position) {
-//		return JSON.global.format(object); We are in Java not JSON :)
-		return String.valueOf(object);
+	protected String objectToString(Object source) {
+		return String.valueOf(source);
+	}
+
+	/**
+	 * Cast the given 'source' to the given 'productClass'. Using the java primitive types casting method.
+	 *
+	 * @param source       the value to be casted
+	 * @param productClass the type to cast the value to
+	 * @return the given value casted to the given productClass
+	 * @throws NullPointerException if the given 'productClass' is null. Or if the 'productClass' is a primitive type. And the given 'source' is null
+	 * @throws ClassCastException   if the source can't be casted to the productClass using the java primitive types casting method
+	 */
+	@ConvertMethod(in = @Type(in = {
+			boolean.class,
+			byte.class,
+			char.class,
+			double.class,
+			float.class,
+			int.class,
+			long.class,
+			short.class,
+			Boolean.class,
+			Byte.class,
+			Character.class,
+			Double.class,
+			Float.class,
+			Integer.class,
+			Long.class,
+			Short.class,
+	}), out = @Type(in = {
+			boolean.class,
+			byte.class,
+			char.class,
+			double.class,
+			float.class,
+			int.class,
+			long.class,
+			short.class,
+			Boolean.class,
+			Byte.class,
+			Character.class,
+			Double.class,
+			Float.class,
+			Integer.class,
+			Long.class,
+			Short.class,
+	}))
+	protected Object primitiveToPrimitive(Object source, Class<?> productClass) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(productClass, "productClass");
+		}
+
+		return Reflect$.primitiveCast(productClass, source);
 	}
 
 	/**
 	 * The source object of the given recurse object depending on the given position.
 	 *
-	 * @param recurse  the object
-	 * @param out      the targeted return class
-	 * @param position to depend on
+	 * @param source       the object
+	 * @param productClass the targeted return class
+	 * @param position     to depend on
 	 * @return the source object of the given recurse object
+	 * @throws NullPointerException if any of the given parameters is null
+	 * @throws ClassCastException   if the product instance of the given recurse is not instance of the given 'productClass'
 	 */
 	@ConvertMethod(in = @Type(subin = Recurse.class), out = @Type(subin = Object.class))
-	protected Object recurse2object(Object recurse, Class<?> out, BaseConvertPosition position) {
-		Object object = position.parents.get(recurse);
-		if (object == null)
-			throw new IllegalArgumentException("Not recurse!:" + StringUtil.logging(recurse));
-		if (!out.isInstance(object))
-			throw new ClassCastException("The recurse not instance of the targeted class");
-		return object;
-	}
+	protected Object recurseToObject(Object source, Class<?> productClass, BaseConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(source, "source");
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+		}
 
-	/**
-	 * Parse the given {@link CharSequence} to the given 'out' class.
-	 *
-	 * @param sequence to be parsed
-	 * @param out      to parse the sequence to
-	 * @param position to depend on
-	 * @return the given sequence parsed to the given class
-	 */
-	@ConvertMethod(in = @Type(subin = CharSequence.class), out = @Type(subin = {
-			Object.class,
-			boolean.class,
-			byte.class,
-			char.class,
-			double.class,
-			int.class,
-			float.class,
-			long.class,
-			short.class,
-	}))
-	protected Object sequence2object(CharSequence sequence, Class<?> out, BaseConvertPosition position) {
-		return this.convert(JSON.global.parse(sequence), (Class<? super Object>) out);
+		if (position.parents.containsKey(source)) {
+			return productClass.cast(position.parents.get(source));
+		} else {
+			throw new IllegalArgumentException(source + " did not recurse");
+		}
 	}
 
 	/**
@@ -478,60 +674,52 @@ public class BaseConverter extends Converter implements Global {
 		/**
 		 * Construct with the given parameters.
 		 *
-		 * @param parents        the parents mappings.
-		 * @param sourceParent   a source mapping
-		 * @param instanceParent a recurse mapping for the source
+		 * @param parents       the parents mappings.
+		 * @param sourceParent  a source mapping
+		 * @param productParent a recurse mapping for the source
 		 * @throws NullPointerException if 'parents' equals null
 		 */
-		public BaseConvertPosition(Map<Object, Object> parents, Object sourceParent, Object instanceParent) {
-			ObjectUtil.requireNonNull(parents, "parents");
+		public BaseConvertPosition(Map<Object, Object> parents, Object sourceParent, Object productParent) {
+			if (DEBUGGING) {
+				Objects.requireNonNull(parents, "parents");
+				Objects.requireNonNull(sourceParent, "sourceParent");
+				Objects.requireNonNull(productParent, "productParent");
+			}
+
 			this.parents.putAll(parents);
-			this.parents.put(sourceParent, instanceParent);
+			this.parents.put(sourceParent, productParent);
 		}
 
 		/**
-		 * Cast the given object to the given 'out' class. Using the first method annotated with Cast.CastMethod. And that annotation allows the given
-		 * 'in' and 'out' classes. (methods are ordered randomly).
+		 * Cast the given object to the given product class. Using the first method annotated with {@link ConvertMethod}. And that annotation allows
+		 * the given 'productClass' and 'sourceClass'. (methods are ordered randomly).
 		 *
-		 * @param object         the object to be casted
-		 * @param out            the targeted class to cast the object to
-		 * @param <T>            the targeted type
-		 * @param sourceParent   a source mapping
-		 * @param instanceParent a recurse mapping for the source
-		 * @return the given object casted to the given 'out' class
-		 * @throws ClassCastException       on casting failure
-		 * @throws IllegalArgumentException optional. on casting failure
-		 */
-		public <T> T convert(Object object, Class<? super T> out, Object sourceParent, Object instanceParent) {
-			return this.convert(object, out, null, null, false, sourceParent, instanceParent);
-		}
-
-		/**
-		 * Cast the given object to the given 'out' class. Using the first method annotated with Cast.CastMethod. And that annotation allows the given
-		 * 'in' and 'out' classes. (methods are ordered randomly).
-		 *
-		 * @param object         the object to be casted
-		 * @param out            the targeted class to cast the object to
-		 * @param position       to format depending on (null to create a new one)
-		 * @param in             the targeted method parameter type (null for the class of the given object)
-		 * @param clone          true to create a new instance even when the object is instance of the targeted class
-		 * @param sourceParent   a source mapping
-		 * @param instanceParent a recurse mapping for the source
-		 * @param <T>            the targeted type
+		 * @param source        the object to be casted
+		 * @param productClass  the targeted class to cast the object to
+		 * @param position      to format depending on (null to create a new one)
+		 * @param sourceClass   the targeted method parameter type (null for the class of the given object)
+		 * @param clone         true to create a new instance even when the object is instance of the targeted class
+		 * @param sourceParent  a source mapping
+		 * @param productParent a recurse mapping for the source
+		 * @param <T>           the targeted type
 		 * @return the given object casted to the given 'out' class
 		 * @throws ClassCastException       on casting failure
 		 * @throws IllegalArgumentException optional. on casting failure
 		 * @throws NullPointerException     if the 'out' param equals to null
 		 */
-		public <T> T convert(Object object, Class<? super T> out, BaseConvertPosition position, Class<?> in, boolean clone, Object sourceParent, Object instanceParent) {
-			ObjectUtil.requireNonNull(out, "out");
+		public <T> T convert(Object source, Class<? super T> productClass, BaseConvertPosition position, Class<?> sourceClass, boolean clone, Object sourceParent, Object productParent) {
+			if (DEBUGGING) {
+				Objects.requireNonNull(productClass, "productClass");
+				Objects.requireNonNull(sourceParent, "sourceParent");
+				Objects.requireNonNull(productParent, "productParent");
+			}
 
 			if (position == null)
-				position = new BaseConvertPosition(this.parents, sourceParent, instanceParent);
-			if (in == null)
-				in = this.parents.containsKey(object) ? Recurse.class : null;
+				position = new BaseConvertPosition(this.parents, sourceParent, productParent);
+			if (sourceClass == null)
+				sourceClass = this.parents.containsKey(source) ? Recurse.class : null;
 
-			return BaseConverter.this.convert(object, out, position, in, clone);
+			return BaseConverter.this.convert(source, productClass, position, sourceClass, clone);
 		}
 	}
 }

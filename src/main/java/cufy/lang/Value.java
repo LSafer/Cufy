@@ -10,11 +10,9 @@
  */
 package cufy.lang;
 
-import org.cufy.lang.BaseConverter;
-import cufy.util.ObjectUtil;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 /**
  * A value with a type the annotations don't support.
@@ -30,7 +28,7 @@ public @interface Value {
 	 *
 	 * @return the caster to be used to cast this value
 	 */
-	Class<? extends Converter> converter() default BaseConverter.class;
+	Class<? extends Converter> converter();
 
 	/**
 	 * Whether this value equals to null or not.
@@ -62,15 +60,24 @@ public @interface Value {
 		 *
 		 * @param value source
 		 * @return a value from the given typedValue annotation instance
-		 * @throws NullPointerException       if the given value is null
-		 * @throws IllegalAnnotationException if ANY throwable get thrown while constructing the object
+		 * @throws NullPointerException   if the given value is null
+		 * @throws BadAnnotationException if ANY throwable get thrown while constructing the object
 		 */
 		public static Object construct(Value value) {
 			try {
-				ObjectUtil.requireNonNull(value, "value");
-				return value.isnull() ? null : Global.get(value.converter()).convert(value.value(), (Class<? super Object>) value.type());
+				Objects.requireNonNull(value, "value");
+
+				if (value.isnull()) {
+					return null;
+				} else {
+					Converter converter = Global.get(value.converter());
+					String str = value.value();
+					Class<?> type = value.type();
+
+					return converter.convert(str, type);
+				}
 			} catch (Throwable t) {
-				throw new IllegalAnnotationException("Can't construct " + value.getClass() + ": " + t.getMessage(), t);
+				throw new BadAnnotationException("Can't construct " + value.getClass() + ": " + t.getMessage(), t);
 			}
 		}
 
@@ -81,17 +88,17 @@ public @interface Value {
 		 * @param expected expected type
 		 * @param <T>      var-arg of the expected type
 		 * @return a value from the given typedValue annotation instance
-		 * @throws NullPointerException       if the given value is null
-		 * @throws IllegalAnnotationException if ANY throwable get thrown while constructing the object
+		 * @throws NullPointerException   if any param given is null
+		 * @throws BadAnnotationException if ANY throwable get thrown while constructing the object
 		 */
 		public static <T> T construct(Value value, Class<T> expected) {
-			ObjectUtil.requireNonNull(value, "value");
-			ObjectUtil.requireNonNull(expected, "expected");
+			Objects.requireNonNull(value, "value");
+			Objects.requireNonNull(expected, "expected");
 
 			try {
 				return expected.cast(construct(value));
 			} catch (ClassCastException e) {
-				throw new IllegalAnnotationException("Can't construct " + value.getClass() + ": " + e.getMessage(), e);
+				throw new BadAnnotationException("Can't construct " + value.getClass() + ": " + e.getMessage(), e);
 			}
 		}
 	}

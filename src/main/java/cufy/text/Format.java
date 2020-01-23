@@ -11,8 +11,9 @@
 package cufy.text;
 
 import cufy.beans.Invoke;
+import cufy.beans.MethodGroup;
+import cufy.beans.StaticMethod;
 import cufy.lang.Type;
-import cufy.util.ObjectUtil;
 
 import java.io.*;
 import java.lang.annotation.ElementType;
@@ -21,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -29,50 +31,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * to add a method on a dynamic method group. the method should be annotated with the group annotation. (see {@link Invoke}). Also the method should
  * match the conditions of that group to avoid parameters/output mismatches. This abstract have three methods group {@link ClassifyMethod}, {@link
  * ParseMethod} and {@link FormatMethod}. each of them have their own conditions.
- *
- * <ul>
- *     <font color="orange" size="4" face="verdana"><b>Abstract Methods:</b></font>
- *     <li>
- *         <font color="yellow">Support</font>
- *         <ul>
- *             <li>{@link #newFormatPosition}</li>
- *             <li>{@link #newParsePosition}</li>
- *         </ul>
- *     </li>
- * </ul>
- * <ul>
- *     <font color="orange" size="4" face="verdana"><b>Static-Dynamic Methods:</b></font>
- *     <li>
- *         <font color="yellow">{@link ClassifyMethod Classify}</font>
- *         <ul>
- *             <li>{@link #getClassifyMethods}</li>
- *             <li>{@link #classify0}</li>
- *             <li>{@link #classify}</li>
- *             <li>{@link #classifyElse}</li>
- *             <li>{@link #isNull}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link FormatMethod Format}</font>
- *         <ul>
- *             <li>{@link #getFormatMethod}</li>
- *             <li>{@link #format0}</li>
- *             <li>{@link #format}</li>
- *             <li>{@link #formatElse}</li>
- *             <li>{@link #formatNull}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link ParseMethod Parse}</font>
- *         <ul>
- *             <li>{@link #getParseMethod}</li>
- *             <li>{@link #parse0}</li>
- *             <li>{@link #parse}</li>
- *             <li>{@link #parseElse}</li>
- *             <li>{@link #parseNull}</li>
- *         </ul>
- *     </li>
- * </ul>
  *
  * @author LSaferSE
  * @version 6 release (12-Dec-2019)
@@ -86,14 +44,18 @@ public abstract class Format extends Invoke {
 	 *
 	 * @param sequence to query a suitable class for
 	 * @return the suitable class for the given sequence. Or null if unknown.
-	 * @throws FormatException when any formatting error occurs
+	 * @throws ParseException       when any classifying error occurs
+	 * @throws NullPointerException if the given 'sequence' is null
+	 * @throws IOError              when any IOException occurred
 	 */
 	@StaticMethod
 	public Class<?> classify(CharSequence sequence) {
+		Objects.requireNonNull(sequence, "sequence");
+
 		try {
 			return this.classify(new StringReader(String.valueOf(sequence)), null);
 		} catch (IOException e) {
-			throw new Error(e);
+			throw new IOError(e);
 		}
 	}
 
@@ -104,32 +66,23 @@ public abstract class Format extends Invoke {
 	 * @param reader   to read the sequence from
 	 * @param position to classify depending on (null to create a new position)
 	 * @return the suitable class for the given string. Or null if unknown.
-	 * @throws FormatException      when any formatting error occurs
+	 * @throws ParseException       when any classifying error occurs
 	 * @throws IOException          if any I/O exception occurs
 	 * @throws NullPointerException if the given reader is null
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
 	@StaticMethod
 	public Class<?> classify(Reader reader, ParsePosition position) throws IOException {
-		ObjectUtil.requireNonNull(reader, "reader");
+		Objects.requireNonNull(reader, "reader");
 
-		position = ObjectUtil.requireNonNullElseGet(position, this::newParsePosition);
+		if (position == null)
+			position = this.newParsePosition();
 
-		reader.mark(50);
+		for (Method method : this.getClassifyMethods())
+			if (this.classify0(method, reader, position))
+				return method.getAnnotation(ClassifyMethod.class).value();
 
-		if (this.isNull(reader, position)) {
-			reader.reset();
-			return null;
-		}
-
-		for (Method method : this.getClassifyMethods()) {
-			boolean w = this.classify0(method, reader, position);
-			reader.reset();
-			if (w) return method.getAnnotation(ClassifyMethod.class).value();
-		}
-
-		Class<?> klass = this.classifyElse(reader, position);
-		reader.reset();
-		return klass;
+		return this.classifyElse(reader, position);
 	}
 
 	/**
@@ -138,15 +91,18 @@ public abstract class Format extends Invoke {
 	 * @param object the object to be formatted
 	 * @return the formatted string
 	 * @throws FormatException when any formatting error occurs
+	 * @throws IOError         when any IOException occurred
 	 */
 	@StaticMethod
 	public String format(Object object) {
 		StringWriter writer = new StringWriter();
+
 		try {
-			this.format(object, writer, null, null);
+			this.format(writer, object, null, null);
 		} catch (IOException e) {
-			throw new Error(e);
+			throw new IOError(e);
 		}
+
 		return writer.toString();
 	}
 
@@ -163,26 +119,19 @@ public abstract class Format extends Invoke {
 	 * @throws IOException          if any I/O exception occurs
 	 */
 	@StaticMethod
-	public void format(Object object, Writer writer, FormatPosition position, Class<?> klass) throws IOException {
-		ObjectUtil.requireNonNull(writer, "writer");
+	public void format(Writer writer, Object object, FormatPosition position, Class<?> klass) throws IOException {
+		Objects.requireNonNull(writer, "writer");
 
-		position = ObjectUtil.requireNonNullElseGet(position, this::newFormatPosition);
-
-		if (object == null) {
-			this.formatNull(writer, position);
-			return;
-		}
-
-		klass = ObjectUtil.requireNonNullElseGet(klass, object::getClass);
+		if (position == null)
+			position = this.newFormatPosition();
+		if (klass == null)
+			klass = object == null ? Void.class : object.getClass();
 
 		Method method = this.getFormatMethod(klass);
 
-		if (method == null) {
-			this.formatElse(object, writer, position);
-			return;
-		}
-
-		this.format0(method, object, writer, position);
+		if (method == null)
+			this.formatElse(writer, object, position);
+		else this.format0(method, writer, object, position);
 	}
 
 	/**
@@ -190,18 +139,24 @@ public abstract class Format extends Invoke {
 	 *
 	 * @param sequence to parse the object from
 	 * @return parsed object from the given sequence
-	 * @throws ParseException when any parsing error occurs
+	 * @throws ParseException       when any parsing error occurs
+	 * @throws NullPointerException if the given sequence is null
+	 * @throws IOError              when any IOException occurred
 	 */
 	@StaticMethod
 	public Object parse(CharSequence sequence) {
+		Objects.requireNonNull(sequence, "sequence");
+
+		AtomicReference<Object> buffer = new AtomicReference<>();
+		Reader reader = new StringReader(sequence.toString());
+
 		try {
-			Reader reader = new StringReader(String.valueOf(sequence));
-			AtomicReference<Object> buffer = new AtomicReference<>();
-			this.parse(reader, buffer, null, null);
-			return buffer.get();
+			this.parse(buffer, reader, null, null);
 		} catch (IOException e) {
-			throw new Error(e);
+			throw new IOError(e);
 		}
+
+		return buffer.get();
 	}
 
 	/**
@@ -215,29 +170,23 @@ public abstract class Format extends Invoke {
 	 * @throws ParseException       when any parsing error occurs
 	 * @throws NullPointerException if the given 'reader' or 'buffer' is null
 	 * @throws IOException          if any I/O exception occurs
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
 	@StaticMethod
-	public void parse(Reader reader, AtomicReference<?> buffer, ParsePosition position, Class<?> klass) throws IOException {
-		ObjectUtil.requireNonNull(reader, "reader");
-		ObjectUtil.requireNonNull(buffer, "buffer");
+	public void parse(AtomicReference<?> buffer, Reader reader, ParsePosition position, Class<?> klass) throws IOException {
+		Objects.requireNonNull(reader, "reader");
+		Objects.requireNonNull(buffer, "buffer");
 
-		position = ObjectUtil.requireNonNullElseGet(position, this::newParsePosition);
-
+		if (position == null)
+			position = newParsePosition();
 		if (klass == null)
 			klass = this.classify(reader, position);
-		if (klass == null) {
-			this.parseNull(reader, buffer, position);
-			return;
-		}
 
 		Method method = this.getParseMethod(klass);
 
-		if (method == null) {
-			this.parseElse(reader, buffer, position);
-			return;
-		}
-
-		this.parse0(method, reader, buffer, position);
+		if (method == null)
+			this.parseElse(buffer, reader, position);
+		else this.parse0(method, buffer, reader, position);
 	}
 
 	/**
@@ -247,29 +196,43 @@ public abstract class Format extends Invoke {
 	 * @param reader   to read the sequence from
 	 * @param position to classify depending on
 	 * @return if the string is instance of the class
-	 * @throws ParseException       when any classification error occurs
-	 * @throws NullPointerException if null passed as any param
-	 * @throws IOException          if any I/O exception occurs
+	 * @throws ParseException           when any classification error occurs
+	 * @throws NullPointerException     if null passed as any param
+	 * @throws IOException              if any I/O exception occurs
+	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
 	@StaticMethod
 	protected boolean classify0(Method method, Reader reader, ParsePosition position) throws IOException {
-		ObjectUtil.requireNonNull(method, "method");
-		ObjectUtil.requireNonNull(reader, "reader");
-		ObjectUtil.requireNonNull(position, "position");
+		if (DEBUGGING) {
+			Objects.requireNonNull(method, "method");
+			Objects.requireNonNull(reader, "reader");
+			Objects.requireNonNull(position, "position");
+		}
+
 		try {
 			method.setAccessible(true);
-			return (boolean) method.invoke(this, reader, position);
+			switch (method.getParameterCount()) {
+				case 0:
+					return (boolean) method.invoke(this);
+				case 1:
+					return (boolean) method.invoke(this, reader);
+				case 2:
+					return (boolean) method.invoke(this, reader, position);
+				default:
+					throw new IllegalArgumentException(method + " have illegal parameters count");
+			}
 		} catch (IllegalAccessException e) {
-			throw new Error(e);
+			throw new IllegalArgumentException(method + " have limited access", e);
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			if (cause instanceof IOException)
+			if (cause instanceof IOException) {
 				throw (IOException) cause;
-			if (cause instanceof RuntimeException)
-				throw (RuntimeException) cause;
-			if (cause instanceof Error)
-				throw (Error) cause;
-			throw new Error(cause);
+			} else if (cause instanceof ParseException) {
+				throw (ParseException) cause;
+			} else {
+				throw new ParseException(cause);
+			}
 		}
 	}
 
@@ -279,14 +242,19 @@ public abstract class Format extends Invoke {
 	 * @param reader   to read the string from
 	 * @param position to depend on
 	 * @return the class from the string given by the given reader
-	 * @throws ParseException                if any parsing exception occurs
-	 * @throws NullPointerException          if any param given is null
-	 * @throws IOException                   if any I/O exception occurred
-	 * @throws UnsupportedOperationException if the method isn't supported by the format
+	 * @throws ParseException       if any parsing exception occurs
+	 * @throws NullPointerException if any param given is null
+	 * @throws IOException          if any I/O exception occurred
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
 	@StaticMethod
 	protected Class<?> classifyElse(Reader reader, ParsePosition position) throws IOException {
-		throw new UnsupportedOperationException();
+		if (DEBUGGING) {
+			Objects.requireNonNull(reader, "reader");
+			Objects.requireNonNull(position, "position");
+		}
+
+		throw new ParseException("Can't classify");
 	}
 
 	/**
@@ -296,31 +264,47 @@ public abstract class Format extends Invoke {
 	 * @param object   the object ot be formatted
 	 * @param writer   to write the text to
 	 * @param position to format depending on
-	 * @throws FormatException      when any formatting errors occurs
-	 * @throws NullPointerException if any argument given is null
-	 * @throws IOException          if any I/O exception occurs
+	 * @throws FormatException          when any formatting errors occurs
+	 * @throws NullPointerException     if any argument given is null
+	 * @throws IOException              if any I/O exception occurs
+	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
 	 */
-	@SuppressWarnings("DuplicatedCode")
 	@StaticMethod
-	protected void format0(Method method, Object object, Writer writer, FormatPosition position) throws IOException {
-		ObjectUtil.requireNonNull(method, "method");
-		ObjectUtil.requireNonNull(object, "object");
-		ObjectUtil.requireNonNull(writer, "writer");
-		ObjectUtil.requireNonNull(position, "position");
+	protected void format0(Method method, Writer writer, Object object, FormatPosition position) throws IOException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(method, "method");
+			Objects.requireNonNull(writer, "writer");
+			Objects.requireNonNull(position, "position");
+		}
+
 		try {
 			method.setAccessible(true);
-			method.invoke(this, object, writer, position);
+			switch (method.getParameterCount()) {
+				case 0:
+					method.invoke(this);
+				case 1:
+					method.invoke(this, writer);
+					return;
+				case 2:
+					method.invoke(this, writer, object);
+					return;
+				case 3:
+					method.invoke(this, writer, object, position);
+					return;
+				default:
+					throw new IllegalArgumentException(method + " have illegal parameters count");
+			}
 		} catch (IllegalAccessException e) {
-			throw new Error(e);
+			throw new IllegalArgumentException(method + " have limited access", e);
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			if (cause instanceof IOException)
+			if (cause instanceof IOException) {
 				throw (IOException) cause;
-			if (cause instanceof RuntimeException)
-				throw (RuntimeException) cause;
-			if (cause instanceof Error)
-				throw (Error) cause;
-			throw new Error(cause);
+			} else if (cause instanceof FormatException) {
+				throw (FormatException) cause;
+			} else {
+				throw new FormatException(cause);
+			}
 		}
 	}
 
@@ -331,29 +315,19 @@ public abstract class Format extends Invoke {
 	 * @param object   the unsupported object ot be formatted
 	 * @param writer   to write the text to
 	 * @param position to format depending ond
-	 * @throws FormatException               when any formatting errors occurs
-	 * @throws NullPointerException          if any param given is null
-	 * @throws IOException                   if any I/O exception occurs
-	 * @throws UnsupportedOperationException if the method isn't supported by the format
+	 * @throws FormatException          when any formatting errors occurs
+	 * @throws NullPointerException     if any param given is null
+	 * @throws IOException              if any I/O exception occurs
+	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
 	 */
 	@StaticMethod
-	protected void formatElse(Object object, Writer writer, FormatPosition position) throws IOException {
-		throw new UnsupportedEncodingException();
-	}
+	protected void formatElse(Writer writer, Object object, FormatPosition position) throws IOException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(writer, "writer");
+			Objects.requireNonNull(position, "position");
+		}
 
-	/**
-	 * Format the value 'null'. This method shouldn't be directly called.
-	 *
-	 * @param writer   to write the text to
-	 * @param position to format depending on
-	 * @throws FormatException               when any formatting errors occurs (Also if this method isn't supported by this formatter)
-	 * @throws NullPointerException          if any argument given is null
-	 * @throws UnsupportedOperationException if the method isn't supported by the format
-	 * @throws IOException                   if any I/O exception occurs
-	 */
-	@StaticMethod
-	protected void formatNull(Writer writer, FormatPosition position) throws IOException {
-		throw new UnsupportedEncodingException();
+		throw new FormatException("Can't format");
 	}
 
 	/**
@@ -362,8 +336,8 @@ public abstract class Format extends Invoke {
 	 * @return the classify methods group
 	 */
 	@StaticMethod
-	protected synchronized MethodGroup getClassifyMethods() {
-		return this.getMethodGroup(ClassifyMethod.class);
+	protected MethodGroup getClassifyMethods() {
+		return this.getMethods().getMethodGroup(ClassifyMethod.class);
 	}
 
 	/**
@@ -374,10 +348,10 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if the given class is null
 	 */
 	@StaticMethod
-	protected synchronized Method getFormatMethod(Class<?> klass) {
-		ObjectUtil.requireNonNull(klass, "klass");
-		return this.getMethodGroup(FormatMethod.class).get(klass, method ->
-				Type.util.test(method.getAnnotation(FormatMethod.class).in(), klass));
+	protected Method getFormatMethod(Class<?> klass) {
+		Objects.requireNonNull(klass, "klass");
+		return this.getMethods().getMethodGroup(FormatMethod.class).getMethodGroup(klass, method ->
+				Type.util.test(method.getAnnotation(FormatMethod.class).value(), klass)).get(0);
 	}
 
 	/**
@@ -388,27 +362,10 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if the given class is null
 	 */
 	@StaticMethod
-	protected synchronized Method getParseMethod(Class<?> klass) {
-		ObjectUtil.requireNonNull(klass, "klass");
-		return this.getMethodGroup(ParseMethod.class).get(klass, method ->
-				Type.util.test(method.getAnnotation(ParseMethod.class).out(), klass));
-	}
-
-	/**
-	 * Check if the given string should be parsed as null or not. This method shouldn't be directly called.
-	 *
-	 * @param reader   to read the string from
-	 * @param position to check depending on
-	 * @return whether the given string is null or not.
-	 * @throws ParseException       if any parsing exception occurs
-	 * @throws NullPointerException if the position given is null
-	 * @throws IOException          if any I/O exception occurs
-	 */
-	@StaticMethod
-	protected boolean isNull(Reader reader, ParsePosition position) throws IOException {
-		ObjectUtil.requireNonNull(reader, "reader");
-		ObjectUtil.requireNonNull(position, "position");
-		return false;
+	protected Method getParseMethod(Class<?> klass) {
+		Objects.requireNonNull(klass, "klass");
+		return this.getMethods().getMethodGroup(ParseMethod.class).getMethodGroup(klass, method ->
+				Type.util.test(method.getAnnotation(ParseMethod.class).value(), klass)).get(0);
 	}
 
 	/**
@@ -442,31 +399,48 @@ public abstract class Format extends Invoke {
 	 * @param reader   to read the text from
 	 * @param buffer   to store the parsed object to while parsing
 	 * @param position to parse the given sequence depending on
-	 * @throws ParseException       when any parsing error occurs
-	 * @throws NullPointerException if any of the given parameters is null
-	 * @throws IOException          if any I/O exception occurs
+	 * @throws ParseException           when any parsing error occurs
+	 * @throws NullPointerException     if any of the given parameters is null
+	 * @throws IOException              if any I/O exception occurs
+	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
-	@SuppressWarnings("DuplicatedCode")
 	@StaticMethod
-	protected void parse0(Method method, Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
-		ObjectUtil.requireNonNull(method, "method");
-		ObjectUtil.requireNonNull(reader, "reader");
-		ObjectUtil.requireNonNull(buffer, "buffer");
-		ObjectUtil.requireNonNull(position, "position");
+	protected void parse0(Method method, AtomicReference<?> buffer, Reader reader, ParsePosition position) throws IOException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(method, "method");
+			Objects.requireNonNull(reader, "reader");
+			Objects.requireNonNull(buffer, "buffer");
+			Objects.requireNonNull(position, "position");
+		}
+
 		try {
 			method.setAccessible(true);
-			method.invoke(this, reader, buffer, position);
+			switch (method.getParameterCount()) {
+				case 0:
+					method.invoke(this);
+				case 1:
+					method.invoke(this, buffer);
+				case 2:
+					method.invoke(this, buffer, reader);
+					return;
+				case 3:
+					method.invoke(this, buffer, reader, position);
+					return;
+				default:
+					throw new IllegalArgumentException(method + " have illegal parameters count");
+			}
 		} catch (IllegalAccessException e) {
-			throw new Error(e);
+			throw new IllegalArgumentException(method + " have a limited access", e);
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			if (cause instanceof IOException)
+			if (cause instanceof IOException) {
 				throw (IOException) cause;
-			if (cause instanceof RuntimeException)
-				throw (RuntimeException) cause;
-			if (cause instanceof Error)
-				throw (Error) cause;
-			throw new Error(cause);
+			} else if (cause instanceof ParseException) {
+				throw (ParseException) cause;
+			} else {
+				throw new ParseException(cause);
+			}
 		}
 	}
 
@@ -476,33 +450,20 @@ public abstract class Format extends Invoke {
 	 * @param reader   to read the text from
 	 * @param buffer   to store the parsed object to while parsing
 	 * @param position to parse depending on
-	 * @throws ParseException                when the parser can't handle the given string
-	 * @throws NullPointerException          if any of the given parameters is null
-	 * @throws UnsupportedOperationException if this method not supported by this format
-	 * @throws IOException                   if any I/O exception occurs
+	 * @throws ParseException       when the parser can't handle the given string
+	 * @throws NullPointerException if any of the given parameters is null
+	 * @throws IOException          if any I/O exception occurs
+	 * @apiNote this may invoke {@link Reader#mark} on the given reader
 	 */
 	@StaticMethod
-	protected void parseElse(Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
-		throw new UnsupportedOperationException();
-	}
+	protected void parseElse(AtomicReference<?> buffer, Reader reader, ParsePosition position) throws IOException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(reader, "reader");
+			Objects.requireNonNull(buffer, "buffer");
+			Objects.requireNonNull(position, "position");
+		}
 
-	/**
-	 * Parse the given null text. Set the parsed object to the given buffer.
-	 *
-	 * @param reader   to read the text from
-	 * @param buffer   to set the object to
-	 * @param position to depend on
-	 * @throws ParseException                when the parser can't handle the given string
-	 * @throws NullPointerException          if any of the given parameters is null
-	 * @throws UnsupportedOperationException if this method not supported by this format
-	 * @throws IOException                   if any I/O exception occurs
-	 */
-	@StaticMethod
-	protected void parseNull(Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
-		ObjectUtil.requireNonNull(reader, "reader");
-		ObjectUtil.requireNonNull(buffer, "buffer");
-		ObjectUtil.requireNonNull(position, "position");
-		buffer.set(null);
+		throw new ParseException("Can't parse");
 	}
 
 	/**
@@ -539,7 +500,7 @@ public abstract class Format extends Invoke {
 	@Target(ElementType.METHOD)
 	protected @interface ClassifyMethod {
 		/**
-		 * Tells what class the annotated method is looking for. This will direct to the method with the same {@link ParseMethod#out()} as this
+		 * Tells what class the annotated method is looking for. This will direct to the method with the same {@link ParseMethod#value()} as this
 		 * value.
 		 *
 		 * @return the class the annotated method is looking for
@@ -551,7 +512,7 @@ public abstract class Format extends Invoke {
 	 * Navigate the {@link Format} class that the annotated method is a stringing method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #format0} rules
-	 * @see #format(Object, Writer, FormatPosition, Class) parameterization
+	 * @see #format(Writer, Object, FormatPosition, Class) parameterization
 	 * @see #getFormatMethod grouping
 	 * @see #format0 invokation
 	 */
@@ -563,14 +524,14 @@ public abstract class Format extends Invoke {
 		 *
 		 * @return the supported/unsupported classes
 		 */
-		Type in() default @Type;
+		Type value() default @Type;
 	}
 
 	/**
 	 * Navigate the {@link Format} class that the annotated method is a parsing method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #parse0} rules
-	 * @see #parse(Reader, AtomicReference, ParsePosition, Class) parameterization
+	 * @see #parse(AtomicReference, Reader, ParsePosition, Class) parameterization
 	 * @see #getParseMethod grouping
 	 * @see #parse0 invokation
 	 */
@@ -583,6 +544,57 @@ public abstract class Format extends Invoke {
 		 *
 		 * @return the magnet values for the classify method
 		 */
-		Type out() default @Type;
+		Type value() default @Type;
 	}
 }
+//	/**
+//	 * Parse the given null text. Set the parsed object to the given buffer.
+//	 *
+//	 * @param reader   to read the text from
+//	 * @param buffer   to set the object to
+//	 * @param position to depend on
+//	 * @throws ParseException                when the parser can't handle the given string
+//	 * @throws NullPointerException          if any of the given parameters is null
+//	 * @throws UnsupportedOperationException if this method not supported by this format
+//	 * @throws IOException                   if any I/O exception occurs
+//	 */
+//	@StaticMethod
+//	protected void parseNull(Reader reader, AtomicReference<?> buffer, ParsePosition position) throws IOException {
+//		Objects.requireNonNull(reader, "reader");
+//		Objects.requireNonNull(buffer, "buffer");
+//		Objects.requireNonNull(position, "position");
+//		buffer.set(null);
+//	}
+
+//
+//	/**
+//	 * Check if the given string should be parsed as null or not. This method shouldn't be directly called.
+//	 *
+//	 * @param reader   to read the string from
+//	 * @param position to check depending on
+//	 * @return whether the given string is null or not.
+//	 * @throws ParseException       if any parsing exception occurs
+//	 * @throws NullPointerException if the position given is null
+//	 * @throws IOException          if any I/O exception occurs
+//	 */
+//	@StaticMethod
+//	protected boolean isNull(Reader reader, ParsePosition position) throws IOException {
+//		Objects.requireNonNull(reader, "reader");
+//		Objects.requireNonNull(position, "position");
+//		return false;
+//	}
+
+//	/**
+//	 * Format the value 'null'. This method shouldn't be directly called.
+//	 *
+//	 * @param writer   to write the text to
+//	 * @param position to format depending on
+//	 * @throws FormatException               when any formatting errors occurs (Also if this method isn't supported by this formatter)
+//	 * @throws NullPointerException          if any argument given is null
+//	 * @throws UnsupportedOperationException if the method isn't supported by the format
+//	 * @throws IOException                   if any I/O exception occurs
+//	 */
+//	@StaticMethod
+//	protected void formatNull(Writer writer, FormatPosition position) throws IOException {
+//		throw new UnsupportedEncodingException();
+//	}

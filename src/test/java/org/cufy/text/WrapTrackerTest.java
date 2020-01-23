@@ -29,13 +29,13 @@ public class WrapTrackerTest {
 		tracker.append("\\");
 		tracker.append("'");
 
-		Assert.assertEquals(4, tracker.length());
+		Assert.assertEquals("Wrong level", 4, tracker.length());
 
 		tracker.append("\"");
 		tracker.append(">");
 		tracker.append("]");
 		tracker.append("}");
 
-		Assert.assertEquals(0, tracker.length());
+		Assert.assertEquals("All wraps cleared", 0, tracker.length());
 	}
 }

@@ -10,8 +10,6 @@
  */
 package cufy.text;
 
-import cufy.util.StringUtil;
-
 /**
  * Thrown to indicate that the application has attempted to convert a string to an object, but that string does not have the appropriate type.
  *
@@ -60,7 +58,7 @@ public class ParseException extends RuntimeException {
 	 * @param sequence the string caused the exception while parsing it
 	 */
 	public ParseException(String msg, CharSequence sequence) {
-		super(msg + ": " + StringUtil.logging(sequence));
+		super(msg + ": " + sequence);
 		this.sequence = sequence;
 	}
 
@@ -83,7 +81,7 @@ public class ParseException extends RuntimeException {
 	 * @param sequence the string caused the exception while parsing it
 	 */
 	public ParseException(String msg, Exception cause, CharSequence sequence) {
-		super(msg + ": " + StringUtil.logging(sequence), cause);
+		super(msg + ": " + sequence, cause);
 		this.sequence = sequence;
 	}
 

@@ -26,27 +26,31 @@ public class ConverterTest {
 		Assert.assertEquals("Wrong cast", "abc", caster.convert(new StringBuilder("abc"), String.class));
 	}
 
-	@Test(expected = ClassCastException.class)
+	@Test(expected = ClassConversionException.class)
 	public void castElse() {
 		caster.convert(new Object(), List.class);
 	}
 
-	@Test(timeout = 50, expected = NullPointerException.class)
+	@Test(timeout = 50)
 	public void castNull() {
-		caster.convert(null, String.class);
+		try {
+			caster.convert(null, String.class);
+		} catch (ClassConversionException e) {
+			Assert.assertSame("Not the targeted exception", NullPointerException.class, e.getCause().getClass());
+		}
 	}
 
 	public static class TestConverter extends Converter {
-		@Override
-		protected <T> T convertNull(Class<?> out, ConvertPosition position) {
-			throw new NullPointerException();
-		}
-
 		@ConvertMethod(in = @Type(subin = CharSequence.class), out = @Type(in = String.class))
-		public String cast(CharSequence object, Class<String> klass, ConvertPosition position) {
+		public String c0(CharSequence object, Class<String> klass, ConvertPosition position) {
 			Objects.requireNonNull(position, "position");
 			Objects.requireNonNull(object, "object");
 			return String.valueOf(object);
+		}
+
+		@ConvertMethod(in = @Type(in = Void.class), out = @Type(subin = Object.class))
+		protected <T> T c1(Object object, Class<?> out, ConvertPosition position) {
+			throw new NullPointerException();
 		}
 	}
 }

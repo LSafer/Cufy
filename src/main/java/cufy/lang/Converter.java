@@ -11,7 +11,7 @@
 package cufy.lang;
 
 import cufy.beans.Invoke;
-import cufy.util.ObjectUtil;
+import cufy.beans.StaticMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,6 +19,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * An abstract for casting classes. Used to simplify the castings and make it more inheritable. Also make inheriting just for add some futures more
@@ -26,29 +28,6 @@ import java.lang.reflect.Method;
  * method on a dynamic method group. the method should be annotated with the group annotation. (see {@link Invoke}). Also the method should match the
  * conditions of that group to avoid parameters/output mismatches. This abstract have the method group {@link ConvertMethod}. and that group have it's
  * own conditions.
- *
- * <ul>
- *     <font color="orange" size="4" face="verdana"><b>Abstract Methods:</b></font>
- *     <li>
- *         <font color="yellow">Support</font>
- *         <ul>
- *             <li>{@link #newConvertPosition()}</li>
- *         </ul>
- *     </li>
- * </ul>
- * <ul>
- *     <font color="orange" size="4" face="verdana"><b>Static-Dynamic Methods:</b></font>
- *     <li>
- *         <font color="yellow">{@link ConvertMethod Cast}</font>
- *         <ul>
- *             <li>{@link #getConvertMethod}</li>
- *             <li>{@link #convert0}</li>
- *             <li>{@link #convert}</li>
- *             <li>{@link #convertNull}</li>
- *             <li>{@link #convertElse}</li>
- *         </ul>
- *     </li>
- * </ul>
  *
  * @author LSaferSE
  * @version 7 release (07-Dec-2019)
@@ -59,88 +38,93 @@ public abstract class Converter extends Invoke {
 	/**
 	 * Cast the given object to the given class.
 	 *
-	 * @param object the object to be casted
-	 * @param out    the targeted class to cast the object to
-	 * @param <T>    the targeted type
-	 * @return the given object casted to the given 'out' class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
-	 * @throws NullPointerException     if the 'out' param equals to null
+	 * @param source       the object to be casted
+	 * @param productClass the targeted class to cast the object to
+	 * @param <T>          the targeted type
+	 * @return the given object casted to the given 'productClass'
+	 * @throws ClassConversionException on converting failure occurred
+	 * @throws NullPointerException     if the 'productClass' is null
 	 */
 	@StaticMethod
-	public <T> T convert(Object object, Class<? super T> out) {
-		return this.convert(object, out, null, null, false);
+	public <T> T convert(Object source, Class<? super T> productClass) {
+		return this.convert(source, productClass, null, null, false);
 	}
 
 	/**
-	 * Cast the given object to the given 'out' class. Using the first method annotated with {@link ConvertMethod}. And that annotation allows the
-	 * given 'in' and 'out' classes. (methods are ordered randomly)
+	 * Cast the given object to the given 'productClass' class. Using the first method annotated with {@link ConvertMethod}. And that annotation
+	 * allows the given 'sourceClass' and 'productClass' classes. (methods are ordered randomly)
 	 *
-	 * @param object   the object to be casted
-	 * @param out      the targeted class to cast the object to
-	 * @param position to format depending on (null to create a new one)
-	 * @param in       the targeted method parameter type (null for the class of the given object)
-	 * @param clone    true to create a new instance even when the object is instance of the targeted class
-	 * @param <T>      the targeted type
-	 * @return the given object casted to the given 'out' class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
-	 * @throws NullPointerException     if the 'out' param equals to null
+	 * @param source       the object to be casted
+	 * @param productClass the targeted class to cast the object to
+	 * @param position     to format depending on (null to create a new one)
+	 * @param sourceClass  the targeted method parameter type (null for the class of the given object)
+	 * @param clone        true to create a new instance even when the object is instance of the targeted class
+	 * @param <T>          the targeted type
+	 * @return the given object casted to the given 'productClass' class
+	 * @throws ClassConversionException on converting failure occurred
+	 * @throws NullPointerException     if the 'productClass' param equals to null
 	 */
 	@StaticMethod
-	public <T> T convert(Object object, Class<? super T> out, ConvertPosition position, Class<?> in, boolean clone) {
-		ObjectUtil.requireNonNull(out, "out");
+	public <T> T convert(Object source, Class<? super T> productClass, ConvertPosition position, Class<?> sourceClass, boolean clone) {
+		Objects.requireNonNull(productClass, "productClass");
 
-		position = ObjectUtil.requireNonNullElseGet(position, this::newConvertPosition);
+		if (position == null)
+			position = this.newConvertPosition();
+		if (!clone && productClass.isInstance(source))
+			return (T) source;
+		if (sourceClass == null)
+			sourceClass = source == null ? Void.class : source.getClass();
 
-		if (object == null)
-			return this.convertNull(out, position);
-		if (!clone && out.isInstance(object))
-			return (T) object;
-		if (object instanceof Convertible) {
-			T cast = ((Convertible) object).convertTo(out, position);
-			if (cast != null)
-				return cast;
+		Method method = this.getConvertMethod(sourceClass, productClass);
+
+		if (method == null) {
+			return (T) this.convertElse(source, productClass, position);
+		} else {
+			return (T) this.convert0(method, source, productClass, position);
 		}
-
-		in = ObjectUtil.requireNonNullElseGet(in, object::getClass);
-
-		Method method = this.getConvertMethod(in, out);
-
-		if (method == null)
-			return this.convertElse(object, out, position);
-
-		return this.convert0(method, object, out, position);
 	}
 
 	/**
 	 * Invoke the given cast method with the given parameters.
 	 *
-	 * @param method   to be invoked
-	 * @param object   the object to be casted
-	 * @param out      the targeted class to cast the object to
-	 * @param position to format depending on
-	 * @param <T>      the targeted type
+	 * @param method       to be invoked
+	 * @param source       the object to be casted
+	 * @param productClass the targeted class to cast the object to
+	 * @param position     to format depending on
 	 * @return the given object casted to the given 'out' class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
+	 * @throws ClassConversionException on converting failure occurred
 	 * @throws NullPointerException     if any of the given parameters is null
+	 * @throws IllegalArgumentException if the given method have limited access. Or if the given method have illegal parameters count
 	 */
 	@StaticMethod
-	protected <T> T convert0(Method method, Object object, Class<? super T> out, ConvertPosition position) {
-		ObjectUtil.requireNonNull(method, "method");
-		ObjectUtil.requireNonNull(object, "object");
-		ObjectUtil.requireNonNull(out, "out");
-		ObjectUtil.requireNonNull(position, "position");
+	protected Object convert0(Method method, Object source, Class<?> productClass, ConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(method, "method");
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+		}
 
 		try {
 			method.setAccessible(true);
-			return (T) method.invoke(this, object, out, position);
+			switch (method.getParameterCount()) {
+				case 0:
+					return method.invoke(this);
+				case 1:
+					return method.invoke(this, source);
+				case 2:
+					return method.invoke(this, source, productClass);
+				case 3:
+					return method.invoke(this, source, productClass, position);
+				default:
+					throw new IllegalArgumentException(methods + " have illegal parameters count");
+			}
 		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(method + " have limited access", e);
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			throw cause instanceof RuntimeException ? (RuntimeException) cause : new RuntimeException(cause);
+			if (cause instanceof ClassConversionException)
+				throw (ClassConversionException) cause;
+			else throw new ClassConversionException(cause);
 		}
 	}
 
@@ -148,58 +132,43 @@ public abstract class Converter extends Invoke {
 	 * Cast the given unsupported type object to the given class. If no dynamic method can handle the object. This method will be invoked. This method
 	 * shouldn't be directly called.
 	 *
-	 * @param object   the object to be casted
-	 * @param out      the targeted class to cast the object to
-	 * @param position to format depending on
-	 * @param <T>      the targeted type
-	 * @return the given object casted to the given 'out' class
+	 * @param source       the object to be casted
+	 * @param productClass the targeted class to cast the object to
+	 * @param position     to format depending on
+	 * @return the given object casted to the given 'productClass' class
 	 * @throws ClassCastException       on casting failure (Also if this method isn't supported by this caster)
 	 * @throws IllegalArgumentException optional. on casting failure
 	 * @throws NullPointerException     if any of the given parameters equals to null
 	 */
 	@StaticMethod
-	protected <T> T convertElse(Object object, Class<? super T> out, ConvertPosition position) {
-		ObjectUtil.requireNonNull(object, "object");
-		ObjectUtil.requireNonNull(out, "out");
-		ObjectUtil.requireNonNull(position, "position");
-		throw new ClassCastException("Cannot cast " + object.getClass() + " to " + out);
+	protected Object convertElse(Object source, Class<?> productClass, ConvertPosition position) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(position, "position");
+		}
+
+		throw new ClassConversionException("Cannot convert " + source.getClass() + " to " + productClass);
 	}
 
 	/**
-	 * Cast the value null to the given 'out' class.
+	 * Find a method that casts any of the given 'sourceClass'. to the given 'productClass'.
 	 *
-	 * @param out      the targeted class to cast the object to
-	 * @param position to format depending on
-	 * @param <T>      the targeted type
-	 * @return the given object casted to the given 'out' class
-	 * @throws ClassCastException       on casting failure
-	 * @throws IllegalArgumentException optional. on casting failure
-	 * @throws NullPointerException     if the given position equals to null
-	 */
-	@StaticMethod
-	protected <T> T convertNull(Class<?> out, ConvertPosition position) {
-		ObjectUtil.requireNonNull(out, "out");
-		ObjectUtil.requireNonNull(position, "position");
-		return null;
-	}
-
-	/**
-	 * Find a method that casts any of the given 'input' class. to the given 'output' class.
-	 *
-	 * @param input  type that the targeted method can cast
-	 * @param output type that the targeted method can return
-	 * @return a method that casts the given input class to the given output class
+	 * @param sourceClass  type that the targeted method can cast
+	 * @param productClass type that the targeted method can return
+	 * @return a method that casts the given sourceClass to the given productClass class
 	 * @throws NullPointerException if any of the given parameters equals to null
 	 */
 	@StaticMethod
-	protected synchronized Method getConvertMethod(Class<?> input, Class<?> output) {
-		ObjectUtil.requireNonNull(input, "input");
-		ObjectUtil.requireNonNull(output, "output");
+	protected Method getConvertMethod(Class<?> sourceClass, Class<?> productClass) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(sourceClass, "sourceClass");
+			Objects.requireNonNull(productClass, "productClass");
+		}
 
-		return this.getMethodGroup(ConvertMethod.class).get(input.getName() + output.getName(), method -> {
-			ConvertMethod caster = method.getAnnotation(ConvertMethod.class);
-			return Type.util.test(caster.in(), input) && Type.util.test(caster.out(), output);
-		});
+		return this.getMethods().getMethodGroup(ConvertMethod.class).getMethodGroup(Arrays.asList(sourceClass, productClass), method -> {
+			ConvertMethod annotation = method.getAnnotation(ConvertMethod.class);
+			return Type.util.test(annotation.in(), sourceClass) && Type.util.test(annotation.out(), productClass);
+		}).get(0);
 	}
 
 	/**
@@ -233,14 +202,14 @@ public abstract class Converter extends Invoke {
 		 *
 		 * @return the input range
 		 */
-		Type in() default @Type;
+		Type in();
 
 		/**
 		 * The output classes range the annotated method targeting.
 		 *
 		 * @return the output range
 		 */
-		Type out() default @Type;
+		Type out();
 	}
 
 	/**
@@ -252,5 +221,6 @@ public abstract class Converter extends Invoke {
 	 * @since 25-Nov-2019
 	 */
 	public interface ConvertPosition {
+		//Customize it whatever you like :)
 	}
 }

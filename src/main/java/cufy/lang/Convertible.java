@@ -10,14 +10,13 @@
  */
 package cufy.lang;
 
-import cufy.util.ObjectUtil;
-import org.cufy.lang.BaseConverter;
+import java.util.Objects;
 
 /**
  * Defines that the implement class is a {@link Converter} user. Added more methods to direct use the {@link Converter}.
  *
  * @author LSaferSE
- * @version 3 release (07-Dec-2019)
+ * @version 4 beta (18-Jan-2020)
  * @since 31-Aug-19
  */
 public interface Convertible {
@@ -33,41 +32,23 @@ public interface Convertible {
 	 * @throws NullPointerException     if the given class is null
 	 */
 	default <T> T as(Class<? super T> klass) {
-		ObjectUtil.requireNonNull(klass, "klass");
+		Objects.requireNonNull(klass, "klass");
 		return this.converter().convert(this, klass, null, null, false);
 	}
 
 	/**
 	 * Clone this class into a new instance of the given class.
 	 *
-	 * @param klass to get a new instance of (or null for the class of this instance)
+	 * @param klass to get a new instance of
 	 * @param <T>   type of the new clone
 	 * @return a new clone casted from this to the given class
+	 * @throws NullPointerException     if the given class is null
 	 * @throws ClassCastException       on casting failure
 	 * @throws IllegalArgumentException optional. on casting failure
 	 */
 	default <T> T clone(Class<? super T> klass) {
-		return this.converter().convert(this, klass == null ? (Class<? super T>) this.getClass() : klass, null, null, true);
-	}
-
-	/**
-	 * Override the casting process to cast this object to the given class using this method.
-	 *
-	 * @param klass    to cast this object to
-	 * @param position to start with
-	 * @param <T>      the targeted type
-	 * @return this object casted to the given class. Or null if this fails to cast
-	 * @throws ClassCastException   on casting failure
-	 * @throws NullPointerException if the given class or the given position are null
-	 * @apiNote this is a class based casting. And it don't use the caster of this object. so PLEASE DON'T USE IT DIRECTLY
-	 * @implNote this method will override caster methods. Here is a trick. Return an object contained on this. Represents this. And extends the given
-	 * class.
-	 * @implSpec Return null to skip to the caster casting methods.
-	 */
-	default <T> T convertTo(Class<? super T> klass, Converter.ConvertPosition position) {
-		ObjectUtil.requireNonNull(klass, "klass");
-		ObjectUtil.requireNonNull(position, "position");
-		return null;
+		Objects.requireNonNull(klass, "klass");
+		return this.converter().convert(this, klass, null, null, true);
 	}
 
 	/**
@@ -75,7 +56,5 @@ public interface Convertible {
 	 *
 	 * @return the caster used by this
 	 */
-	default Converter converter() {
-		return BaseConverter.global;
-	}
+	Converter converter();
 }

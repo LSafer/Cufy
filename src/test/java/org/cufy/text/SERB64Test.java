@@ -21,6 +21,6 @@ public class SERB64Test {
 		String[] original = {"A", "B", "C"};
 		String formatted = SERB64.global.format(original);
 		String[] parsed = (String[]) SERB64.global.parse(formatted);
-		Assert.assertArrayEquals(original, parsed);
+		Assert.assertArrayEquals("original don't match the formatted then parsed object", original, parsed);
 	}
 }

@@ -14,36 +14,18 @@ import cufy.lang.Global;
 import cufy.lang.Type;
 import cufy.text.Format;
 import cufy.text.FormatException;
-import cufy.text.ParseException;
-import cufy.util.ReaderUtil;
+import cufy.util.Reader$;
 
 import java.io.*;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A {@link Format} for {@link Serializable}s using {@link Base64}.
  *
- * <ul>
- *     <font color="orange" size="4"><b>Dynamic Methods:</b></font>
- *     <li>
- *         <font color="yellow">{@link Serializable}</font>
- *         <ul>
- *             <li>{@link #formatSerializable}</li>
- *             <li>{@link #isSerializable}</li>
- *             <li>{@link #parseSerializable}</li>
- *         </ul>
- *     </li>
- *     <li>
- *         <font color="yellow">{@link #formatNull Null}</font>
- *         <ul>
- *             <li>{@link #formatNull}</li>
- *         </ul>
- *     </li>
- * </ul>
- *
  * @author LSaferSE
- * @version 5 release (13-Dec-2019)
+ * @version 6 release (23-Jan-2020)
  * @see Base64
  * @see Serializable
  * @since 02-Nov-2019
@@ -54,10 +36,14 @@ public class SERB64 extends Format implements Global {
 	 */
 	final public static SERB64 global = new SERB64();
 
-	@Override
-	@StaticMethod
-	protected void formatNull(Writer writer, FormatPosition position) throws IOException {
-		this.formatSerializable(null, writer, position);
+	/**
+	 * The expected length of the values.
+	 */
+	protected int DEFAULT_VALUE_LENGTH;
+
+	{
+		DEBUGGING = false;
+		DEFAULT_VALUE_LENGTH = 100;
 	}
 
 	/**
@@ -65,72 +51,72 @@ public class SERB64 extends Format implements Global {
 	 *
 	 * @param serializable to be serialized
 	 * @param writer       to append the serial to
-	 * @param position     to serialize depending on
 	 * @throws IllegalArgumentException when unable to serialize the given object
 	 * @throws FormatException          when any formatting errors occurs
 	 * @throws IOException              if any I/O exception occurs
+	 * @throws NullPointerException     if any of the given parameters is null
 	 */
-	@FormatMethod(in = @Type(subin = {
+	@FormatMethod(value = @Type(subin = {
 			Serializable.class,
-			Serializable[].class,
+			Void.class,
 			boolean.class,
 			byte.class,
 			char.class,
 			double.class,
 			float.class,
+			int.class,
 			long.class,
 			short.class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			long[].class,
-			short[].class
 	}))
-	protected void formatSerializable(Serializable serializable, Writer writer, FormatPosition position) throws IOException {
+	protected void formatSerializable(Writer writer, Serializable serializable) throws IOException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(serializable, "serializable");
+			Objects.requireNonNull(writer, "writer");
+		}
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
+
 		oos.writeObject(serializable);
-		byte[] bytes = baos.toByteArray();
-		String serial = Base64.getEncoder().encodeToString(bytes);
-		writer.append(serial);
+		String string = Base64.getEncoder().encodeToString(baos.toByteArray());
+		writer.write(string);
+
 		baos.close();
 		oos.close();
 	}
 
 	/**
-	 * Check if the string from the given reader is written on {@link Base64} or not.
+	 * returns true.
 	 *
-	 * @param reader   to read the string from
-	 * @param position to classify depending on
 	 * @return true
-	 * @throws ParseException when any classification error occurs
-	 * @apiNote default returns true (just to trigger the super class)
 	 */
 	@ClassifyMethod(Serializable.class)
-	protected boolean isSerializable(Reader reader, ParsePosition position) {
+	protected boolean isSerializable() {
 		return true;
 	}
 
 	/**
 	 * Parse the string from the given reader (written on base64) to a serializable object. Then set it to the given {@link AtomicReference buffer}.
 	 *
-	 * @param reader   to read from
-	 * @param buffer   to set the parsed object to
-	 * @param position to parse the given sequence depending on
+	 * @param reader to read from
+	 * @param buffer to set the parsed object to
 	 * @throws FormatException        when any parsing error occurs
 	 * @throws IOException            if any I/O exception occurs
 	 * @throws ClassNotFoundException class of a serialized object cannot be found.
 	 */
-	@ParseMethod(out = @Type(subin = Serializable.class))
-	protected void parseSerializable(Reader reader, AtomicReference<Serializable> buffer, ParsePosition position) throws IOException, ClassNotFoundException {
-		String string = ReaderUtil.read(reader);
-		byte[] bytes = Base64.getDecoder().decode(string);
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+	@ParseMethod(@Type(Serializable.class))
+	protected void parseSerializable(AtomicReference<Serializable> buffer, Reader reader) throws IOException, ClassNotFoundException {
+		if (DEBUGGING) {
+			Objects.requireNonNull(buffer, "buffer");
+			Objects.requireNonNull(reader, "reader");
+		}
+
+		String string = Reader$.getRemaining(reader, DEFAULT_VALUE_LENGTH, DEFAULT_VALUE_LENGTH);
+		ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(string));
 		ObjectInputStream ois = new ObjectInputStream(bais);
-		Serializable value = (Serializable) ois.readObject();
-		buffer.set(value);
+
+		buffer.set((Serializable) ois.readObject());
+
 		bais.close();
 		ois.close();
 	}
