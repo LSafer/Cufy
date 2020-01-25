@@ -55,27 +55,29 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws NullPointerException     if any of the given parameters is null
 	 * @throws IllegalArgumentException if the given 'source' isn't an array. Or if the given 'productClass' is not a class for arrays.
 	 */
-	@ConvertMethod(in = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			int[].class,
-			long[].class,
-			short[].class
-	}), out = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			int[].class,
-			long[].class,
-			short[].class
-	}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  float[].class,
+						  int[].class,
+						  long[].class,
+						  short[].class
+					}),
+			out = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  float[].class,
+						  int[].class,
+						  long[].class,
+						  short[].class
+					}))
 	protected Object arrayToArray(Object source, Class<?> productClass, BaseConvertPosition position) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -100,7 +102,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return product;
 	}
-
 	/**
 	 * Construct a new collection with the type of the given type. Then copy all elements from the given 'source' to the constructed collection.
 	 *
@@ -111,17 +112,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     if the given 'source' is not an array. Or if the given 'productClass' is not a class for collections
 	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
 	 */
-	@ConvertMethod(in = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			int[].class,
-			float[].class,
-			long[].class,
-			short[].class,
-	}), out = @Type(subin = Collection.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  int[].class,
+						  float[].class,
+						  long[].class,
+						  short[].class,
+					}),
+			out = @Type(
+					subin = Collection.class
+			))
 	protected Collection arrayToCollection(Object source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -143,7 +148,6 @@ public class BaseConverter extends Converter implements Global {
 		product.addAll(list);
 		return product;
 	}
-
 	/**
 	 * Construct a new map of the given type. Then put every element from the given 'source' to the constructed map. Every element will be put to an
 	 * {@link Integer} key representing it's index on the 'source'.
@@ -155,17 +159,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     if the given 'source' is not an array. Or if the given 'productClass' is not a class for maps.
 	 * @throws ReflectiveOperationException if any exception occurs while trying to construct the new map
 	 */
-	@ConvertMethod(in = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			int[].class,
-			float[].class,
-			long[].class,
-			short[].class,
-	}), out = @Type(subin = Map.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  int[].class,
+						  float[].class,
+						  long[].class,
+						  short[].class,
+					}),
+			out = @Type(
+					subin = Map.class
+			))
 	protected Map arrayToMap(Object source, Class<? extends Map> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -197,17 +205,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException if the given 'productClass' is not a class for arrays
 	 */
 	@SuppressWarnings("DuplicatedCode")
-	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			float[].class,
-			int[].class,
-			long[].class,
-			short[].class
-	}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Collection.class
+			),
+			out = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  float[].class,
+						  int[].class,
+						  long[].class,
+						  short[].class
+					}))
 	protected Object collectionToArray(Collection<?> source, Class<?> productClass, BaseConvertPosition position) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -228,7 +240,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return product;
 	}
-
 	/**
 	 * Construct a new collection with the type of the given type. Then copy all elements from the given 'source' to the constructed collection.
 	 *
@@ -239,7 +250,13 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for collections
 	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
 	 */
-	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = Collection.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Collection.class
+			),
+			out = @Type(
+					subin = Collection.class
+			))
 	protected Collection collectionToCollection(Collection<?> source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -257,7 +274,6 @@ public class BaseConverter extends Converter implements Global {
 		product.addAll(source);
 		return product;
 	}
-
 	/**
 	 * Construct a new map of the given type. Then put every element from the given 'source' to the constructed map. Every element will be put to an
 	 * {@link Integer} key representing it's index on the 'source'.
@@ -269,7 +285,13 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     or if the given 'productClass' is not a class for maps.
 	 * @throws ReflectiveOperationException if any exception occurs while trying to construct the new map
 	 */
-	@ConvertMethod(in = @Type(subin = Collection.class), out = @Type(subin = Map.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Collection.class
+			),
+			out = @Type(
+					subin = Map.class
+			))
 	protected Map collectionToMap(Collection<?> source, Class<? extends Map> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -297,7 +319,13 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the new file
 	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for files
 	 */
-	@ConvertMethod(in = @Type(subin = File.class), out = @Type(subout = File.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = File.class
+			),
+			out = @Type(
+					subin = File.class
+			))
 	protected File fileToFile(File source, Class<? extends File> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -321,18 +349,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws NullPointerException     if any of the given parameters is null
 	 * @throws IllegalArgumentException if the given 'productClass' is not a class for arrays
 	 */
-	@SuppressWarnings("DuplicatedCode")
-	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = {
-			Object[].class,
-			boolean[].class,
-			byte[].class,
-			char[].class,
-			double[].class,
-			int[].class,
-			float[].class,
-			long[].class,
-			short[].class,
-	}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Map.class
+			),
+			out = @Type(
+					subin = Object[].class,
+					in = {boolean[].class,
+						  byte[].class,
+						  char[].class,
+						  double[].class,
+						  int[].class,
+						  float[].class,
+						  long[].class,
+						  short[].class,
+					}))
 	protected Object mapToArray(Map<?, ?> source, Class<?> productClass, BaseConvertPosition position) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -359,7 +390,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return product;
 	}
-
 	/**
 	 * Construct a new collection with type of the given class. And fill it with values from the given 'source'.
 	 *
@@ -370,7 +400,14 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for maps
 	 * @throws ReflectiveOperationException if any exception occurred while trying to construct the product collection
 	 */
-	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Collection.class, subout = List.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Map.class
+			),
+			out = @Type(
+					subin = Collection.class,
+					subout = List.class
+			))
 	protected Collection mapToCollection(Map<?, ?> source, Class<? extends Collection> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -388,7 +425,6 @@ public class BaseConverter extends Converter implements Global {
 		collection.addAll(source.values());
 		return collection;
 	}
-
 	/**
 	 * Construct a new list with type of the given type. This method will copy element that have been mapped to a non-negative {@link Integer} key
 	 * only. Those keys will be used as Indexes for the elements they're pointing at. And the indexes between will be filled with nulls.
@@ -400,7 +436,13 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws NullPointerException         if any of the given parameters is null
 	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for lists
 	 */
-	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = List.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Map.class
+			),
+			out = @Type(
+					subin = List.class
+			))
 	protected List mapToList(Map<?, ?> source, Class<? extends List> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -428,7 +470,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return product;
 	}
-
 	/**
 	 * Construct a new map copping the value of the given 'source'.
 	 *
@@ -439,7 +480,13 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws IllegalArgumentException     if the given 'productClass' is not a class for maps
 	 * @throws NullPointerException         if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Map.class), out = @Type(subin = Map.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Map.class
+			),
+			out = @Type(
+					subin = Map.class
+			))
 	protected Map mapToMap(Map<?, ?> source, Class<? extends Map> productClass) throws ReflectiveOperationException {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -463,7 +510,13 @@ public class BaseConverter extends Converter implements Global {
 	 *
 	 * @return null
 	 */
-	@ConvertMethod(in = @Type(subin = Void.class), out = @Type(subin = Object.class))
+	@ConvertMethod(
+			in = @Type(
+					in = Void.class
+			),
+			out = @Type(
+					subin = Object.class
+			))
 	protected Object nullToObject() {
 		return null;
 	}
@@ -475,7 +528,20 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as byte
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Byte.class, byte.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {byte.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = {Byte.class,
+						  byte.class
+					}))
 	protected Byte numberToByte(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -483,7 +549,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return source.byteValue();
 	}
-
 	/**
 	 * Get a {@link Double} with the type of the given class. With the value of the given {@link Number}.
 	 *
@@ -491,7 +556,20 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as double
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Double.class, double.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {byte.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = {Double.class,
+						  double.class
+					}))
 	protected Double numberToDouble(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -499,7 +577,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return source.doubleValue();
 	}
-
 	/**
 	 * Get a {@link Float} with the type of the given class. With the value of the given {@link Number}.
 	 *
@@ -507,7 +584,20 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as float
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Float.class, float.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {byte.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = {Float.class,
+						  float.class
+					}))
 	protected Float numberToFloat(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -515,7 +605,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return source.floatValue();
 	}
-
 	/**
 	 * Get a {@link Integer} with the type of the given class. With the value of the given {@link Number}.
 	 *
@@ -523,7 +612,20 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as integer
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Integer.class, int.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {byte.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = {Integer.class,
+						  int.class
+					}))
 	protected Integer numberToInteger(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -531,7 +633,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return source.intValue();
 	}
-
 	/**
 	 * Get a {@link Long} with the type of the given class. With the value of the given {@link Number}.
 	 *
@@ -539,7 +640,20 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as long
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Long.class, long.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {byte.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = {Long.class,
+						  long.class
+					}))
 	protected Long numberToLong(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -547,7 +661,6 @@ public class BaseConverter extends Converter implements Global {
 
 		return source.longValue();
 	}
-
 	/**
 	 * Get a {@link Short} with the type of the given class. With the value of the given {@link Number}.
 	 *
@@ -555,7 +668,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @return the value of the given number as short
 	 * @throws NullPointerException if any of the given parameters is null
 	 */
-	@ConvertMethod(in = @Type(subin = Number.class), out = @Type(in = {Short.class, short.class}))
+	@ConvertMethod(
+			in = @Type(
+					subin = Number.class,
+					in = {
+							byte.class,
+							double.class,
+							float.class,
+							int.class,
+							long.class,
+							short.class
+					}),
+			out = @Type(
+					in = {Short.class,
+						  short.class
+					}))
 	protected Short numberToShort(Number source) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -570,7 +697,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @param source an Object.
 	 * @return the string representation of the Object argument
 	 */
-	@ConvertMethod(in = @Type(subin = Object.class), out = @Type(in = String.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Object.class,
+					in = {byte.class,
+						  boolean.class,
+						  char.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}),
+			out = @Type(
+					in = String.class
+			))
 	protected String objectToString(Object source) {
 		return String.valueOf(source);
 	}
@@ -584,41 +725,43 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws NullPointerException if the given 'productClass' is null. Or if the 'productClass' is a primitive type. And the given 'source' is null
 	 * @throws ClassCastException   if the source can't be casted to the productClass using the java primitive types casting method
 	 */
-	@ConvertMethod(in = @Type(in = {
-			boolean.class,
-			byte.class,
-			char.class,
-			double.class,
-			float.class,
-			int.class,
-			long.class,
-			short.class,
-			Boolean.class,
-			Byte.class,
-			Character.class,
-			Double.class,
-			Float.class,
-			Integer.class,
-			Long.class,
-			Short.class,
-	}), out = @Type(in = {
-			boolean.class,
-			byte.class,
-			char.class,
-			double.class,
-			float.class,
-			int.class,
-			long.class,
-			short.class,
-			Boolean.class,
-			Byte.class,
-			Character.class,
-			Double.class,
-			Float.class,
-			Integer.class,
-			Long.class,
-			Short.class,
-	}))
+	@ConvertMethod(
+			in = @Type(
+					in = {boolean.class,
+						  byte.class,
+						  char.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class,
+						  Boolean.class,
+						  Byte.class,
+						  Character.class,
+						  Double.class,
+						  Float.class,
+						  Integer.class,
+						  Long.class,
+						  Short.class,
+					}),
+			out = @Type(
+					in = {boolean.class,
+						  byte.class,
+						  char.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class,
+						  Boolean.class,
+						  Byte.class,
+						  Character.class,
+						  Double.class,
+						  Float.class,
+						  Integer.class,
+						  Long.class,
+						  Short.class,
+					}))
 	protected Object primitiveToPrimitive(Object source, Class<?> productClass) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(productClass, "productClass");
@@ -637,7 +780,21 @@ public class BaseConverter extends Converter implements Global {
 	 * @throws NullPointerException if any of the given parameters is null
 	 * @throws ClassCastException   if the product instance of the given recurse is not instance of the given 'productClass'
 	 */
-	@ConvertMethod(in = @Type(subin = Recurse.class), out = @Type(subin = Object.class))
+	@ConvertMethod(
+			in = @Type(
+					subin = Recurse.class
+			),
+			out = @Type(
+					subin = Object.class,
+					in = {boolean.class,
+						  byte.class,
+						  char.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}))
 	protected Object recurseToObject(Object source, Class<?> productClass, BaseConvertPosition position) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(source, "source");
@@ -649,6 +806,47 @@ public class BaseConverter extends Converter implements Global {
 			return productClass.cast(position.parents.get(source));
 		} else {
 			throw new IllegalArgumentException(source + " did not recurse");
+		}
+	}
+
+	/**
+	 * Try to construct a new object with type of the given type. Using ether a method called 'valueOf(String)' or a construct that takes a string
+	 * parameter.
+	 *
+	 * @param string       the string to be converted
+	 * @param productClass the class of the returned value
+	 * @return a new object of the given class. With a value of the given string
+	 * @throws NullPointerException         if any of the given parameters is null
+	 * @throws IllegalArgumentException     if the given class don't have a value-of-string method"
+	 * @throws ReflectiveOperationException if any exception occurs when trying instancing the given class
+	 */
+	@ConvertMethod(
+			in = @Type(
+					subin = String.class
+			),
+			out = @Type(
+					subin = Object.class,
+					in = {boolean.class,
+						  byte.class,
+						  char.class,
+						  double.class,
+						  float.class,
+						  int.class,
+						  long.class,
+						  short.class
+					}))
+	protected Object stringToObject(String string, Class<?> productClass) throws ReflectiveOperationException {
+		Objects.requireNonNull(productClass, "productClass");
+		Objects.requireNonNull(string, "sequence");
+
+		try {
+			return productClass.getMethod("valueOf", String.class).invoke(null, string);
+		} catch (NoSuchMethodException ignored) {
+			try {
+				return productClass.getConstructor(String.class).newInstance(string);
+			} catch (NoSuchMethodException ignored1) {
+				throw new IllegalArgumentException(productClass + " don't have a value-of-string method");
+			}
 		}
 	}
 
