@@ -230,7 +230,7 @@ public class BaseConverter extends Converter implements Global {
 		}
 
 		Class<?> productComponentType = productClass.getComponentType();
-		Object product = Array.newInstance(productClass, source.size());
+		Object product = Array.newInstance(productComponentType, source.size());
 
 		int i = 0;
 		for (Object element : source) {
@@ -836,8 +836,10 @@ public class BaseConverter extends Converter implements Global {
 						  short.class
 					}))
 	protected Object stringToObject(String string, Class<?> productClass) throws ReflectiveOperationException {
-		Objects.requireNonNull(productClass, "productClass");
-		Objects.requireNonNull(string, "sequence");
+		if (DEBUGGING) {
+			Objects.requireNonNull(productClass, "productClass");
+			Objects.requireNonNull(string, "sequence");
+		}
 
 		try {
 			return productClass.getMethod("valueOf", String.class).invoke(null, string);
