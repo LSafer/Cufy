@@ -25,13 +25,13 @@ public class InvokeTest {
 
 	@Test(timeout = 50)
 	public void getMethodGroup() throws InvocationTargetException, IllegalAccessException {
-		for (Method method : dynamic.getMethods().getMethodGroup(TestMethod0.class))
+		for (Method method : dynamic.getMethods().subGroup(TestMethod0.class))
 			Assert.assertTrue("Not targeted", ((String) method.invoke(dynamic)).contains("work0"));
 
-		for (Method method : dynamic.getMethods().getMethodGroup(TestMethod1.class))
+		for (Method method : dynamic.getMethods().subGroup(TestMethod1.class))
 			Assert.assertTrue("Not targeted", ((String) method.invoke(dynamic)).contains("work1"));
 
-		for (Method method : dynamic.getMethods().getMethodGroup(TestMethod2.class))
+		for (Method method : dynamic.getMethods().subGroup(TestMethod2.class))
 			Assert.assertTrue("Not targeted", ((String) method.invoke(dynamic)).contains("work2"));
 	}
 

@@ -11,7 +11,6 @@
 package cufy.text;
 
 import cufy.beans.Invoke;
-import cufy.beans.MethodGroup;
 import cufy.beans.StaticMethod;
 import cufy.lang.Type;
 
@@ -327,7 +326,7 @@ public abstract class Format extends Invoke {
 	 */
 	@StaticMethod
 	protected MethodGroup getClassifyMethods() {
-		return this.getMethods().getMethodGroup(ClassifyMethod.class);
+		return this.getMethods().subGroup(ClassifyMethod.class);
 	}
 	/**
 	 * Get the first formatter method that supports the given class as a parameter. (methods ordered randomly).
@@ -339,8 +338,8 @@ public abstract class Format extends Invoke {
 	@StaticMethod
 	protected Method getFormatMethod(Class<?> klass) {
 		Objects.requireNonNull(klass, "klass");
-		return this.getMethods().getMethodGroup(FormatMethod.class).getMethodGroup(klass, method ->
-				Type.util.test(method.getAnnotation(FormatMethod.class).value(), klass)).getMethod();
+		return this.getMethods().subGroup(FormatMethod.class).subGroup(klass, method ->
+				Type.util.test(method.getAnnotation(FormatMethod.class).value(), klass)).getFirst();
 	}
 	/**
 	 * Get the first parser method that supports the given class as a parameter. (methods ordered randomly).
@@ -352,8 +351,8 @@ public abstract class Format extends Invoke {
 	@StaticMethod
 	protected Method getParseMethod(Class<?> klass) {
 		Objects.requireNonNull(klass, "klass");
-		return this.getMethods().getMethodGroup(ParseMethod.class).getMethodGroup(klass, method ->
-				Type.util.test(method.getAnnotation(ParseMethod.class).value(), klass)).getMethod();
+		return this.getMethods().subGroup(ParseMethod.class).subGroup(klass, method ->
+				Type.util.test(method.getAnnotation(ParseMethod.class).value(), klass)).getFirst();
 	}
 
 	/**

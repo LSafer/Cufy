@@ -161,10 +161,10 @@ public abstract class Converter extends Invoke {
 			Objects.requireNonNull(productClass, "productClass");
 		}
 
-		return this.getMethods().getMethodGroup(ConvertMethod.class).getMethodGroup(Arrays.asList(sourceClass, productClass), method -> {
+		return this.getMethods().subGroup(ConvertMethod.class).subGroup(Arrays.asList(sourceClass, productClass), method -> {
 			ConvertMethod annotation = method.getAnnotation(ConvertMethod.class);
 			return Type.util.test(annotation.in(), sourceClass) && Type.util.test(annotation.out(), productClass);
-		}).getMethod();
+		}).getFirst();
 	}
 
 	/**
