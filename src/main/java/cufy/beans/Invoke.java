@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 /**
  * Base class for those classes that are just a collection of methods. This class will manage method grouping. And query methods for the class
- * implementing this.
+ * implementing this. Then save those queries for later use.
  *
  * @author LSaferSE
  * @version 5 release (23-Jan-2020)
