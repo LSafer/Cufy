@@ -1,18 +1,18 @@
 apply plugin: 'java-library'
 
 repositories {
-    jcenter()
-    mavenCentral()
-    maven {
-        url "https://jitpack.io"
-    }
+	jcenter()
+	mavenCentral()
+	maven {
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {
-    compileOnly 'com.github.cufyorg:util:0.0.5-beta3'
-    testImplementation 'com.github.cufyorg:util:0.0.5-beta3'
+	compileOnly 'com.github.cufyorg:util:0.0.5'
 
-    testImplementation 'junit:junit:4.11'
+	testImplementation 'com.github.cufyorg:util:0.0.5'
+	testImplementation 'junit:junit:4.11'
 }
 
 sourceCompatibility = "1.8"
