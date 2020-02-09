@@ -164,6 +164,7 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if the given 'reader' or 'buffer' is null
 	 * @throws IOException          if any I/O exception occurs
 	 * @apiNote this may invoke {@link Reader#mark} on the given reader
+	 * @implSpec if the given buffer is not empty. Do not replace it.
 	 */
 	@StaticMethod
 	public void parse(AtomicReference<?> buffer, Reader reader, ParsePosition position, Class<?> klass) throws IOException {
@@ -390,6 +391,7 @@ public abstract class Format extends Invoke {
 	 * @throws IOException              if any I/O exception occurs
 	 * @throws IllegalArgumentException if the given method has illegal parameters count. Or if it has limited access
 	 * @apiNote this may invoke {@link Reader#mark} on the given reader
+	 * @implSpec if the given buffer is not empty. Do not replace it.
 	 */
 	@StaticMethod
 	protected void parse0(Method method, AtomicReference<?> buffer, Reader reader, ParsePosition position) throws IOException {
@@ -439,6 +441,7 @@ public abstract class Format extends Invoke {
 	 * @throws NullPointerException if any of the given parameters is null
 	 * @throws IOException          if any I/O exception occurs
 	 * @apiNote this may invoke {@link Reader#mark} on the given reader
+	 * @implSpec if the given buffer is not empty. Do not replace it.
 	 */
 	@StaticMethod
 	protected void parseElse(AtomicReference<?> buffer, Reader reader, ParsePosition position) throws IOException {
@@ -503,6 +506,7 @@ public abstract class Format extends Invoke {
 	 * Navigate the {@link Format} class that the annotated method is a parsing method.
 	 *
 	 * @apiNote the annotated method SHOULD match the {@link #parse0} rules
+	 * @implSpec if the given buffer is not empty. Do not replace it.
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
