@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 public class InvokeTest {
 	protected TestInvoke dynamic = new TestInvoke();
 
-	@Test(timeout = 50)
+	@Test(timeout = 100)
 	public void getMethodGroup() throws InvocationTargetException, IllegalAccessException {
 		for (Method method : dynamic.getMethods().subGroup(TestMethod0.class))
 			Assert.assertTrue("Not targeted", ((String) method.invoke(dynamic)).contains("work0"));
