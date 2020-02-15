@@ -10,6 +10,8 @@
  */
 package cufy.lang;
 
+import org.cufy.lang.BaseConverter;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Objects;
@@ -28,7 +30,7 @@ public @interface Value {
 	 *
 	 * @return the caster to be used to cast this value
 	 */
-	Class<? extends Converter> converter();
+	Class<? extends Converter> converter() default BaseConverter.class;
 
 	/**
 	 * Whether this value equals to null or not.
