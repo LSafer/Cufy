@@ -7,21 +7,18 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.beans;
+package cufy.lang;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * Defines that the annotated method isn't a dynamic method. (shouldn't be invoked by reflection).
+ * Defines that the annotated element isn't a dynamic element. (shouldn't be touched by reflection).
  *
  * @author LSaferSE
- * @version 1 release (14-Jan-2020)
+ * @version 2 release (20-Mar-2020)
  * @since 14-Jan-2020
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface StaticMethod {
+public @interface Static {
 }
