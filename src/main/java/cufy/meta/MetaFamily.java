@@ -1,14 +1,13 @@
 /*
  * Copyright (c) 2019, LSafer, All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
  * -You can edit this file (except the header).
  * -If you have change anything in this file. You
  *   shall mention that this file has been edited.
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.lang;
+package cufy.meta;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,22 +16,32 @@ import java.util.Objects;
 /**
  * Class ranging annotation. A way to specify a range of classes.
  *
+ * <ul>
+ *     The levels of Overriding:
+ *     <li>{@link #out()}</li>
+ *     <li>{@link #in()}</li>
+ *     <li>{@link #value()}</li>
+ *     <li>{@link #subout()}</li>
+ *     <li>{@link #subin()}</li>
+ * </ul>
+ *
  * @author LSaferSE
- * @version 3 release (23-Jan-2020)
+ * @version 5 release (31-Mar-2020)
+ * @see util#test(MetaFamily, Class)
  * @since 21-Nov-2019
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Type {
+public @interface MetaFamily {
 	/**
 	 * Classes in range (subclasses NOT included).
 	 *
 	 * @return absolute classes in range
-	 * @apiNote this overrides {@link #subout()}
+	 * @apiNote this will override {@link #subout()}
 	 */
 	Class<?>[] in() default {};
 
 	/**
-	 * Classes out range (subclasses NOT included).
+	 * Classes not in range (subclasses NOT included).
 	 *
 	 * @return absolute classes not in range
 	 * @apiNote this will override {@link #in()}, {@link #subin()}
@@ -55,45 +64,55 @@ public @interface Type {
 	Class<?>[] subout() default {};
 
 	/**
-	 * Works just like {@link #in()}.
+	 * Classes in range (subclasses NOT included).
 	 *
 	 * @return absolute classes in range
+	 * @apiNote this will override {@link #subout()}
 	 */
 	Class<?>[] value() default {};
 
 	/**
-	 * Tools for this annotation. (aka static methods).
+	 * Utilities for this annotation. Since static methods are illegal in annotations.
 	 */
 	final class util {
 		/**
-		 * Check whether the given class is in the given range or not.
+		 * This is a util class. And shall not be instanced as an object.
 		 *
-		 * @param type  to check if the class is in
-		 * @param klass to be checked
-		 * @return whether the given class is in the given range or not
-		 * @throws NullPointerException if ether the given range or class is null
+		 * @throws AssertionError when called
 		 */
-		public static boolean test(Type type, Class<?> klass) {
-			Objects.requireNonNull(type, "type");
+		private util() {
+			throw new AssertionError("No instance for you!");
+		}
+
+		/**
+		 * Check whether the given class is in the given family or not.
+		 *
+		 * @param family to check if the class is in
+		 * @param klass  to be checked
+		 * @return whether the given class is in the given family or not
+		 * @throws NullPointerException if the given 'family' or 'klass' is null
+		 */
+		public static boolean test(MetaFamily family, Class klass) {
+			Objects.requireNonNull(family, "family");
 			Objects.requireNonNull(klass, "klass");
 
-			for (Class<?> exclude : type.out())
+			for (Class<?> exclude : family.out())
 				if (exclude == klass)
 					return false;
 
-			for (Class<?> include : type.in())
+			for (Class<?> include : family.in())
 				if (include == klass)
 					return true;
 
-			for (Class<?> include : type.value())
+			for (Class<?> include : family.value())
 				if (include == klass)
 					return true;
 
-			for (Class<?> exclude : type.subout())
+			for (Class<?> exclude : family.subout())
 				if (exclude.isAssignableFrom(klass))
 					return false;
 
-			for (Class<?> include : type.subin())
+			for (Class<?> include : family.subin())
 				if (include.isAssignableFrom(klass))
 					return true;
 

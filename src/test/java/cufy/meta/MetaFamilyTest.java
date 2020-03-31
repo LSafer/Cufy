@@ -1,14 +1,13 @@
 /*
  * Copyright (c) 2019, LSafer, All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
  * -You can edit this file (except the header).
  * -If you have change anything in this file. You
  *   shall mention that this file has been edited.
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.lang;
+package cufy.meta;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("JavaDoc")
-public class TypeTest {
+public class MetaFamilyTest {
 	@Test(timeout = 50)
 	public void in_out_subin_subout() {
-		Type type = this.newRange(
+		MetaFamily type = this.newRange(
 				new Class[]{Map.class}, //in
 				new Class[]{HashMap.class}, //out
 				new Class[]{List.class}, //subin
@@ -32,20 +31,25 @@ public class TypeTest {
 		);
 
 		//in
-		Assert.assertTrue("Map is absolute included", Type.util.test(type, Map.class));
-		Assert.assertFalse("Number is not included anywhere", Type.util.test(type, Number.class));
+		Assert.assertTrue("Map is absolute included", MetaFamily.util.test(type, Map.class));
+		Assert.assertFalse("Number is not included anywhere", MetaFamily.util.test(type, Number.class));
 		//out
-		Assert.assertFalse("HashMap is absolute excluded", Type.util.test(type, HashMap.class));
+		Assert.assertFalse("HashMap is absolute excluded", MetaFamily.util.test(type, HashMap.class));
 		//subin
-		Assert.assertTrue("List is absolute included", Type.util.test(type, List.class));
-		Assert.assertTrue("ArrayList is a sub included", Type.util.test(type, ArrayList.class));
+		Assert.assertTrue("List is absolute included", MetaFamily.util.test(type, List.class));
+		Assert.assertTrue("ArrayList is a sub included", MetaFamily.util.test(type, ArrayList.class));
 		//subout
-		Assert.assertFalse("CharSequence is absolute excluded", Type.util.test(type, CharSequence.class));
-		Assert.assertFalse("String is sub excluded", Type.util.test(type, String.class));
+		Assert.assertFalse("CharSequence is absolute excluded", MetaFamily.util.test(type, CharSequence.class));
+		Assert.assertFalse("String is sub excluded", MetaFamily.util.test(type, String.class));
 	}
 
-	private Type newRange(Class<?>[] in, Class<?>[] out, Class<?>[] subin, Class<?>[] subout, Class<?>[] value) {
-		return new Type() {
+	@Test
+	public void test() {
+		//TODO
+	}
+
+	private MetaFamily newRange(Class<?>[] in, Class<?>[] out, Class<?>[] subin, Class<?>[] subout, Class<?>[] value) {
+		return new MetaFamily() {
 			@Override
 			public Class<? extends Annotation> annotationType() {
 				return null;
