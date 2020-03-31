@@ -41,6 +41,10 @@ public class ParseArguments<I, O> {
 	 */
 	final public ParseArguments parent;
 	/**
+	 * The depth of this arguments form the first parent.
+	 */
+	final int depth;
+	/**
 	 * The output of the parsing. (could be changed several times!)
 	 */
 	public O output;
@@ -60,13 +64,17 @@ public class ParseArguments<I, O> {
 		Objects.requireNonNull(inputClazz, "inputClazz");
 		Objects.requireNonNull(outputClazz, "outputClazz");
 
-		//NO RECURSE DETECTION
+		int depth = 0;
+
+		for (ParseArguments grand = parent; grand != null; grand = grand.parent, depth++)
+			;//NO RECURSION DETECTION
 
 		this.parent = parent;
 		this.input = input;
 		this.output = output;
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
+		this.depth = depth;
 	}
 
 	/**
@@ -168,13 +176,17 @@ public class ParseArguments<I, O> {
 		if (outputClazz == null)
 			outputClazz = outputAltClazz;
 
-		//NO RECURSE DETECTION
+		int depth = 0;
+
+		for (ParseArguments grand = parent; grand != null; grand = grand.parent, depth++)
+			;//NO RECURSE DETECTION
 
 		this.parent = parent;
 		this.input = input;
 		this.output = output;
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
+		this.depth = depth;
 	}
 
 	/**

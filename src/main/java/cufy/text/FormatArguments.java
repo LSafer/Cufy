@@ -26,6 +26,10 @@ import java.util.Objects;
  */
 public class FormatArguments<I, O> {
 	/**
+	 * The depth of this arguments form the first parent.
+	 */
+	final public int depth;
+	/**
 	 * The input object.
 	 */
 	final public I input;
@@ -61,18 +65,19 @@ public class FormatArguments<I, O> {
 		Objects.requireNonNull(inputClazz, "inputClazz");
 		Objects.requireNonNull(outputClazz, "outputClazz");
 
-		//recurse detection
-		for (FormatArguments grand = parent; grand != null; grand = grand.parent)
-			if (grand.input == input) {
+		int depth = 0;
+
+		//recurse, depth detection
+		for (FormatArguments grand = parent; grand != null; grand = grand.parent, depth++)
+			if (grand.input == input)
 				inputClazz = Clazz.of(Recurse.class, inputClazz.getKlass(), inputClazz.getComponentTypes());
-				break;
-			}
 
 		this.parent = parent;
 		this.input = input;
 		this.output = output;
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
+		this.depth = depth;
 	}
 
 	/**
@@ -153,18 +158,19 @@ public class FormatArguments<I, O> {
 		if (outputClazz == null)
 			outputClazz = outputAltClazz;
 
-		//recurse detection
-		for (FormatArguments grand = parent; grand != null; grand = grand.parent)
-			if (grand.input == input) {
+		int depth = 0;
+
+		//recurse, depth detection
+		for (FormatArguments grand = parent; grand != null; grand = grand.parent, depth++)
+			if (grand.input == input)
 				inputClazz = Clazz.of(Recurse.class, inputClazz.getKlass(), inputClazz.getComponentTypes());
-				break;
-			}
 
 		this.parent = parent;
 		this.input = input;
 		this.output = output;
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
+		this.depth = depth;
 	}
 
 	/**

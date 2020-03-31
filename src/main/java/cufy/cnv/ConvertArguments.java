@@ -41,6 +41,10 @@ public class ConvertArguments<I, O> {
 	 */
 	final public ConvertArguments parent;
 	/**
+	 * The depth of this arguments form the first parent.
+	 */
+	final int depth;
+	/**
 	 * The output of the conversion. (could be changed several times!)
 	 */
 	public O output;
@@ -59,18 +63,19 @@ public class ConvertArguments<I, O> {
 		Objects.requireNonNull(inputClazz, "inputClazz");
 		Objects.requireNonNull(outputClazz, "outputClazz");
 
-		//recurse detection
-		for (ConvertArguments grand = parent; grand != null; grand = grand.parent)
-			if (grand.input == input) {
+		int depth = 0;
+
+		//recurse, depth detection
+		for (ConvertArguments grand = parent; grand != null; grand = grand.parent, depth++)
+			if (grand.input == input)
 				inputClazz = Clazz.of(Recurse.class, inputClazz.getKlass(), inputClazz.getComponentTypes());
-				break;
-			}
 
 		this.input = input;
 		this.output = output;
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
 		this.parent = parent;
+		this.depth = depth;
 	}
 
 	/**
@@ -191,8 +196,10 @@ public class ConvertArguments<I, O> {
 		if (outputClazz == null)
 			outputClazz = outputAltClazz;
 
-		//recurse detection
-		for (ConvertArguments grand = parent; grand != null; grand = grand.parent)
+		int depth = 0;
+
+		//recurse, depth detection
+		for (ConvertArguments grand = parent; grand != null; grand = grand.parent, depth++)
 			if (grand.input == input) {
 				inputClazz = Clazz.of(Recurse.class, inputClazz.getKlass(), inputClazz.getComponentTypes());
 				break;
@@ -203,6 +210,7 @@ public class ConvertArguments<I, O> {
 		this.inputClazz = inputClazz;
 		this.outputClazz = outputClazz;
 		this.parent = parent;
+		this.depth = depth;
 	}
 
 	/**
