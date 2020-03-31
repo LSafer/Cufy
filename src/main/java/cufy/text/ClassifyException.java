@@ -11,18 +11,18 @@
 package cufy.text;
 
 /**
- * Thrown to indicate that the application has attempted to convert a string to an object, but that string does not have the appropriate type.
+ * Thrown to indicate that the application has attempted to classify a string, but that string does not have the appropriate type.
  *
  * @author LSaferSE
- * @version 3 release (23-Jan-2020)
- * @since 16-Nov-2019
+ * @version 3 release (31-Mar-2020)
+ * @since 31-Mar-2020
  */
-public class ParseException extends RuntimeException {
+public class ClassifyException extends RuntimeException {
 	/**
 	 * Constructs a new exception with null as its detail message. The cause is not initialized, and may subsequently be initialized by a call to
 	 * Throwable.initCause(java.lang.Throwable).
 	 */
-	public ParseException() {
+	public ClassifyException() {
 	}
 
 	/**
@@ -30,7 +30,7 @@ public class ParseException extends RuntimeException {
 	 *
 	 * @param msg the message
 	 */
-	public ParseException(String msg) {
+	public ClassifyException(String msg) {
 		super(msg);
 	}
 
@@ -39,7 +39,7 @@ public class ParseException extends RuntimeException {
 	 *
 	 * @param cause the cause
 	 */
-	public ParseException(Throwable cause) {
+	public ClassifyException(Throwable cause) {
 		super(cause);
 	}
 
@@ -49,7 +49,7 @@ public class ParseException extends RuntimeException {
 	 * @param msg   the message
 	 * @param cause the cause
 	 */
-	public ParseException(String msg, Throwable cause) {
+	public ClassifyException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
@@ -62,7 +62,7 @@ public class ParseException extends RuntimeException {
 	 * @param enableSuppression  whether or not suppression is enabled or disabled
 	 * @param writableStackTrace whether or not the stack trace should be writable
 	 */
-	protected ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	protected ClassifyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

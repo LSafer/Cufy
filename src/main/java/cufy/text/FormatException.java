@@ -11,8 +11,7 @@
 package cufy.text;
 
 /**
- * Thrown to indicate that the application has attempted to convert an object to a string (or string to object), but that object does not have the
- * appropriate type.
+ * Thrown to indicate that the application has attempted to convert an object to a string but that object does not have the appropriate type.
  *
  * @author LSaferSE
  * @version 3 release (23-Jan-2020)
@@ -25,6 +24,7 @@ public class FormatException extends RuntimeException {
 	 */
 	public FormatException() {
 	}
+
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -33,6 +33,7 @@ public class FormatException extends RuntimeException {
 	public FormatException(String msg) {
 		super(msg);
 	}
+
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -41,6 +42,7 @@ public class FormatException extends RuntimeException {
 	public FormatException(Throwable cause) {
 		super(cause);
 	}
+
 	/**
 	 * Constructs a new exception with the specified arguments.
 	 *
@@ -50,6 +52,7 @@ public class FormatException extends RuntimeException {
 	public FormatException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
+
 	/**
 	 * Constructs a new exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace enabled or
 	 * disabled.
