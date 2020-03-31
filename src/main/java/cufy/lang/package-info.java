@@ -12,7 +12,7 @@
  * Extra features for the java language.
  *
  * @author LSaferSE
- * @version 2 release (26-Nov-2019)
+ * @version 4 release (30-Mar-2020)
  * @since 07-Nov-19
  */
 package cufy.lang;

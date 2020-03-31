@@ -24,6 +24,7 @@ public class IllegalThreadException extends ConcurrentException {
 	 */
 	public IllegalThreadException() {
 	}
+
 	/**
 	 * Constructs a new illegal access exception with the specified detail message. The cause is not initialized, and may subsequently be initialized
 	 * by a call to Throwable.initCause(java.lang.Throwable).
@@ -33,6 +34,7 @@ public class IllegalThreadException extends ConcurrentException {
 	public IllegalThreadException(String message) {
 		super(message);
 	}
+
 	/**
 	 * Constructs a new illegal access exception with the specified detail message and cause. Note that the detail message associated with cause is
 	 * not automatically incorporated in this illegal access exception's detail message.
@@ -43,6 +45,7 @@ public class IllegalThreadException extends ConcurrentException {
 	public IllegalThreadException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
 	/**
 	 * Constructs a new illegal access exception with the specified cause and a detail message of (cause==null ? null : cause.toString()) (which
 	 * typically contains the class and detail message of cause). This constructor is useful for illegal access exceptions that are little more than
@@ -54,6 +57,7 @@ public class IllegalThreadException extends ConcurrentException {
 	public IllegalThreadException(Throwable cause) {
 		super(cause);
 	}
+
 	/**
 	 * Constructs a new illegal access exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace
 	 * enabled or disabled.

@@ -11,7 +11,7 @@
  * Utilities.
  *
  * @author LSaferSE
- * @version 1 release (25-Jan-20)
+ * @version 2 release (31-Mar-2020)
  * @since 25-Jan-20
  */
 package cufy.util;

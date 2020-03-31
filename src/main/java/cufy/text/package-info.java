@@ -12,7 +12,7 @@
  * All about text and formatting/parsing it.
  *
  * @author LSaferSE
- * @version 2 release (26-Nov-2019)
+ * @version 3 release (30-Mar-2020)
  * @since 15-Nov-19
  */
 package cufy.text;

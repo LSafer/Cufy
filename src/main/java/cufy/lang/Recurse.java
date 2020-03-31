@@ -11,15 +11,17 @@
 package cufy.lang;
 
 /**
- * The Void class is an uninstantiable class representing a recursion.
+ * A representation for a recursion occurred.
  *
  * @author LSaferSE
- * @version 1 release (25-Nov-2019)
+ * @version 2 release (30-Mar-2020)
  * @since 25-Nov-2019
  */
 final public class Recurse {
 	/**
 	 * This is a representation class and should not be instanced.
+	 *
+	 * @throws AssertionError when called
 	 */
 	private Recurse() {
 		throw new AssertionError("No instance for you!");

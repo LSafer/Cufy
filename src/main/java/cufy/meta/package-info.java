@@ -8,10 +8,10 @@
  *   with the word "Editor" on top of it.
  */
 /**
- * Language support.
+ * Stands for "Run Time Annotations". Annotations that has effect at runtime.
  *
  * @author LSaferSE
- * @version 2 release (07-Dec-19)
- * @since 07-Dec-19
+ * @version 2 release (30-Mar-2020)
+ * @since 20-Mar-20
  */
-package org.cufy.lang;
+package cufy.meta;
