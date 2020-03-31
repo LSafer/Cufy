@@ -9,7 +9,6 @@
  */
 package cufy.util;
 
-import cufy.cnv.BaseConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,11 +33,5 @@ public class UnmodifiableGroupTest {
 
 		Assert.assertSame("Didn't returned the already resolved object", my, myAgain);
 		Assert.assertSame("Didn't returned the already resolved object", abc, abcAgain);
-	}
-
-	class X extends BaseConverter {
-		X() {
-			super();
-		}
 	}
 }
