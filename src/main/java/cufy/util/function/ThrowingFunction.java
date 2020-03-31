@@ -7,37 +7,39 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package org.cufy.util.function;
+package cufy.util.function;
 
 import cufy.util.Throwable$;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Functional Interface that can be specified to throw an exception.
  *
  * @param <E> the exception
- * @param <T> the type of the input to the operation
+ * @param <T> the type of the input to the function
+ * @param <R> the type of the result of the function
  * @author LSaferSE
  * @version 1 release (13-Feb-2020)
  * @since 13-Feb-2020
  */
 @FunctionalInterface
-public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
+public interface ThrowingFunction<T, R, E extends Throwable> extends Function<T, R> {
 	@Override
-	default void accept(T t) {
+	default R apply(T t) {
 		try {
-			this.accept0(t);
+			return this.apply0(t);
 		} catch (Throwable e) {
-			Throwable$.<Error>ignite(e);
+			throw Throwable$.<Error>ignite(e);
 		}
 	}
 
 	/**
-	 * Performs this operation on the given argument.
+	 * Applies this function to the given argument.
 	 *
-	 * @param t the input argument
-	 * @throws E the exception that this runnable throws
+	 * @param t the function argument
+	 * @return the function result
+	 * @throws E the exception
 	 */
-	void accept0(T t) throws E;
+	R apply0(T t) throws E;
 }

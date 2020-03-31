@@ -7,7 +7,7 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package org.cufy.util.function;
+package cufy.util.function;
 
 import cufy.util.Throwable$;
 

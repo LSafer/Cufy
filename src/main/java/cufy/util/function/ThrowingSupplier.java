@@ -7,39 +7,37 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package org.cufy.util.function;
+package cufy.util.function;
 
 import cufy.util.Throwable$;
 
-import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Functional Interface that can be specified to throw an exception.
  *
+ * @param <T> the type of results supplied by this supplier
  * @param <E> the exception
- * @param <T> the type of the first argument to the operation
- * @param <U> the type of the second argument to the operation
  * @author LSaferSE
  * @version 1 release (13-Feb-2020)
  * @since 13-Feb-2020
  */
 @FunctionalInterface
-public interface ThrowingBiConsumer<T, U, E extends Throwable> extends BiConsumer<T, U> {
+public interface ThrowingSupplier<T, E extends Throwable> extends Supplier<T> {
 	@Override
-	default void accept(T t, U u) {
+	default T get() {
 		try {
-			this.accept0(t, u);
+			return this.get0();
 		} catch (Throwable e) {
-			Throwable$.<Error>ignite(e);
+			throw Throwable$.<Error>ignite(e);
 		}
 	}
 
 	/**
-	 * Performs this operation on the given arguments. Parameters:
+	 * Gets a result.
 	 *
-	 * @param t the first input argument
-	 * @param u the second input argument
+	 * @return a result
 	 * @throws E the exception
 	 */
-	void accept0(T t, U u) throws E;
+	T get0() throws E;
 }

@@ -7,38 +7,41 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package org.cufy.util.function;
+package cufy.util.function;
 
 import cufy.util.Throwable$;
 
-import java.util.function.UnaryOperator;
+import java.util.function.BiFunction;
 
 /**
  * Functional Interface that can be specified to throw an exception.
  *
- * @param <T> the type of the operand and result of the operator
  * @param <E> the exception
+ * @param <T> the type of the first argument to the function
+ * @param <U> the type of the second argument to the function
+ * @param <R> the type of the result of the function
  * @author LSaferSE
  * @version 1 release (13-Feb-2020)
  * @since 13-Feb-2020
  */
 @FunctionalInterface
-public interface ThrowingUnaryOperator<T, E extends Throwable> extends UnaryOperator<T> {
+public interface ThrowingBiFunction<T, U, R, E extends Throwable> extends BiFunction<T, U, R> {
 	@Override
-	default T apply(T t) {
+	default R apply(T t, U u) {
 		try {
-			return this.apply0(t);
+			return this.apply0(t, u);
 		} catch (Throwable e) {
 			throw Throwable$.<Error>ignite(e);
 		}
 	}
 
 	/**
-	 * Applies this function to the given argument.
+	 * Applies this function to the given arguments.
 	 *
-	 * @param t the function argument
+	 * @param t the first function argument
+	 * @param u the second function argument
 	 * @return the function result
 	 * @throws E the exception
 	 */
-	T apply0(T t) throws E;
+	R apply0(T t, U u) throws E;
 }
