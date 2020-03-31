@@ -7,7 +7,7 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.lang;
+package cufy.cnv;
 
 /**
  * Thrown to indicate that the code has attempted to convert an object to a class of which it can't be converted to. For example, the following code
@@ -19,26 +19,27 @@ package cufy.lang;
  * </pre>
  *
  * @author LSaferSE
- * @version 1 beta (22-Jan-2020)
- * @see ClassCastException
+ * @version 2 release (31-Mar-2020)
  * @since 22-Jan-2020
  */
-public class ClassConversionException extends RuntimeException {
+public class ConvertException extends RuntimeException {
 	/**
 	 * Constructs a new class conversion exception with null as its detail message. The cause is not initialized, and may subsequently be initialized
 	 * by a call to Throwable.initCause(java.lang.Throwable).
 	 */
-	public ClassConversionException() {
+	public ConvertException() {
 	}
+
 	/**
 	 * Constructs a new class conversion exception with the specified detail message. The cause is not initialized, and may subsequently be
 	 * initialized by a call to Throwable.initCause(java.lang.Throwable).
 	 *
 	 * @param message the detail message. The detail message is saved for later retrieval by the Throwable.getMessage() method.
 	 */
-	public ClassConversionException(String message) {
+	public ConvertException(String message) {
 		super(message);
 	}
+
 	/**
 	 * Constructs a new class conversion exception with the specified detail message and cause. Note that the detail message associated with cause is
 	 * not automatically incorporated in this class conversion exception's detail message.
@@ -47,9 +48,10 @@ public class ClassConversionException extends RuntimeException {
 	 * @param cause   the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value is permitted, and indicates
 	 *                that the cause is nonexistent or unknown.)
 	 */
-	public ClassConversionException(String message, Throwable cause) {
+	public ConvertException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
 	/**
 	 * Constructs a new class conversion exception with the specified cause and a detail message of (cause==null ? null : cause.toString()) (which
 	 * typically contains the class and detail message of cause). This constructor is useful for class conversion exceptions that are little more than
@@ -58,9 +60,10 @@ public class ClassConversionException extends RuntimeException {
 	 * @param cause the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value is permitted, and indicates that
 	 *              the cause is nonexistent or unknown.)
 	 */
-	public ClassConversionException(Throwable cause) {
+	public ConvertException(Throwable cause) {
 		super(cause);
 	}
+
 	/**
 	 * Constructs a new class conversion exception with the specified detail message, cause, suppression enabled or disabled, and writable stack trace
 	 * enabled or disabled.
@@ -70,7 +73,7 @@ public class ClassConversionException extends RuntimeException {
 	 * @param enableSuppression  whether or not suppression is enabled or disabled
 	 * @param writableStackTrace whether or not the stack trace should be writable
 	 */
-	protected ClassConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	protected ConvertException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }
