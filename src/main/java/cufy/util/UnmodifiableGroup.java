@@ -16,12 +16,12 @@ import java.util.function.Predicate;
  * A way to store final elements and get subgroups of them. This class holds the elements of it as a final elements. And give the user the ability to
  * iterate the elements back. Or get a subgroup of the elements it has got. The subgroup will be saved by it for the next requests for that group.
  *
- * @param <T> the type of the elements this group holds
+ * @param <E> the type of the elements this group holds
  * @author LSaferSE
- * @version 1 release (25-Jan-2020)
+ * @version 3 release (31-Mar-2020)
  * @since 25-Jan-2020
  */
-public class ConstantGroup<T> extends AbstractSet<T> {
+public class UnmodifiableGroup<E> extends AbstractSet<E> implements Group<E> {
 	/**
 	 * The elements of this group.
 	 *
@@ -31,7 +31,7 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	/**
 	 * The mappings of the subgroups of this group.
 	 */
-	final protected HashMap<Object, ConstantGroup<T>> subgroups = new HashMap<>();
+	final protected HashMap<Object, UnmodifiableGroup<E>> subgroups = new HashMap<>();
 
 	/**
 	 * Construct a new constant group holding the given elements as it's elements.
@@ -39,7 +39,7 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	 * @param elements the elements to be hold
 	 * @throws NullPointerException if the given elements is null
 	 */
-	public ConstantGroup(T... elements) {
+	public UnmodifiableGroup(E... elements) {
 		Objects.requireNonNull(elements, "elements");
 		this.elements = Array$.copyOf(elements, elements.length, Object[].class);
 	}
@@ -50,14 +50,14 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	 * @param elements the elements to be hold
 	 * @throws NullPointerException if the given elements is null
 	 */
-	public ConstantGroup(Collection<T> elements) {
+	public UnmodifiableGroup(Collection<E> elements) {
 		Objects.requireNonNull(elements, "elements");
 		this.elements = elements.toArray();
 	}
 
 	@Override
-	public Iterator<T> iterator() {
-		return (Iterator<T>) Array$.iterator(this.elements);
+	public Iterator<E> iterator() {
+		return (Iterator<E>) Array$.iterator(this.elements);
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	}
 
 	@Override
-	public boolean add(T t) {
+	public boolean add(E e) {
 		throw new UnsupportedOperationException("add");
 	}
 
@@ -101,7 +101,7 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends T> collection) {
+	public boolean addAll(Collection<? extends E> collection) {
 		throw new UnsupportedOperationException("addAll");
 	}
 
@@ -121,31 +121,23 @@ public class ConstantGroup<T> extends AbstractSet<T> {
 	}
 
 	@Override
-	public boolean removeIf(Predicate<? super T> filter) {
+	public boolean removeIf(Predicate<? super E> filter) {
 		throw new UnsupportedOperationException("removeIf");
 	}
 
-	/**
-	 * Returns a subgroup of this group. The subgroup returned has the elements of this that satisfies the given predicate. The given predicate will
-	 * be invoked only if the given key has not been resolved previously. Otherwise the results of that previous call will be returned.
-	 *
-	 * @param groupKey  the key of that group (saves the group for later)
-	 * @param predicate the tester to be satisfied
-	 * @return a subgroup of this group that has only the elements satisfied the given predicate
-	 * @throws NullPointerException if the given 'predicate' is null
-	 */
-	public ConstantGroup<T> subGroup(Object groupKey, Predicate<T> predicate) {
+	@Override
+	public UnmodifiableGroup<E> subGroup(Object groupKey, Predicate<E> predicate) {
 		Objects.requireNonNull(groupKey, "groupKey");
 		Objects.requireNonNull(predicate, "predicate");
 
 		return this.subgroups.computeIfAbsent(groupKey, k -> {
-			Set<T> set = new HashSet<>(this.elements.length);
+			Set<E> set = new HashSet<>(this.elements.length);
 
 			for (Object element : this.elements)
-				if (predicate.test((T) element))
-					set.add((T) element);
+				if (predicate.test((E) element))
+					set.add((E) element);
 
-			return new ConstantGroup<>(set);
+			return new UnmodifiableGroup<>(set);
 		});
 	}
 }
