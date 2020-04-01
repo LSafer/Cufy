@@ -9,9 +9,9 @@
  */
 package cufy.meta;
 
-import cufy.cnv.BaseConverter;
-import cufy.cnv.ConvertArguments;
-import cufy.cnv.Converter;
+import cufy.convert.BaseConverter;
+import cufy.convert.ConvertArguments;
+import cufy.convert.Converter;
 import cufy.lang.Clazz;
 
 import java.lang.annotation.Retention;

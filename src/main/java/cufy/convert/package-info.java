@@ -14,4 +14,4 @@
  * @version 2 release (30-Mar-2020)
  * @since 30-Mar-2020
  */
-package cufy.cnv;
+package cufy.convert;

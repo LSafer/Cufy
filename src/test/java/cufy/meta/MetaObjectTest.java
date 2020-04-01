@@ -9,7 +9,7 @@
  */
 package cufy.meta;
 
-import cufy.cnv.BaseConverter;
+import cufy.convert.BaseConverter;
 import org.junit.Assert;
 import org.junit.Test;
 

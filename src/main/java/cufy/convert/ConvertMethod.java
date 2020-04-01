@@ -7,7 +7,7 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.cnv;
+package cufy.convert;
 
 import cufy.meta.MetaFamily;
 

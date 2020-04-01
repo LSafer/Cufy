@@ -7,7 +7,7 @@
  *   By adding a new header (at the bottom of this header)
  *   with the word "Editor" on top of it.
  */
-package cufy.cnv;
+package cufy.convert;
 
 /**
  * Thrown to indicate that the code has attempted to convert an object to a class of which it can't be converted to. For example, the following code
