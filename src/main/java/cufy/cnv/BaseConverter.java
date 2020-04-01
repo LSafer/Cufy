@@ -104,22 +104,6 @@ public class BaseConverter extends AbstractConverter {
 	}
 
 	/**
-	 * Set the {@link ConvertArguments#output} on the given arguments to a value of the {@link ConvertArguments#input}, but as the class specified
-	 * as in the {@link ConvertArguments#outputClazz}, using a method that support converting {@link ConvertArguments#inputClazz} to {@link
-	 * ConvertArguments#outputClazz}.
-	 *
-	 * @param arguments the conversion instance that holds the variables of this conversion
-	 * @param <O>       the {@link ConvertArguments#output} of the given arguments after the converting process
-	 * @return the type of the output targeted
-	 * @throws ConvertException     if any converting error occurred
-	 * @throws NullPointerException if the given 'arguments' is null.
-	 */
-	@Static
-	public static <O> O sconvert(ConvertArguments<?, O> arguments) {
-		return global.convert(arguments);
-	}
-
-	/**
 	 * Array => Array
 	 * <br/>
 	 * Replace the elements on the {@link ConvertArguments#output} from the given arguments. All from the given {@link ConvertArguments#input} after
@@ -843,7 +827,7 @@ public class BaseConverter extends AbstractConverter {
 						  long.class,
 						  short.class
 					}))
-	protected void recurse_object(ConvertArguments arguments) {
+	protected void recurse_object(ConvertArguments<Recurse, Object> arguments) {
 		if (DEBUGGING) {
 			Objects.requireNonNull(arguments, "arguments");
 		}
@@ -914,6 +898,7 @@ public class BaseConverter extends AbstractConverter {
 	 * Set the given {@link ConvertArguments} to null.
 	 *
 	 * @param arguments the conversion instance that holds the variables of this conversion
+	 * @throws NullPointerException if the given 'arguments' is null
 	 */
 	@ConvertMethod(
 			input = @MetaFamily(
@@ -923,7 +908,11 @@ public class BaseConverter extends AbstractConverter {
 					subin = Object.class,
 					out = String.class
 			))
-	protected void void_object(ConvertArguments arguments) {
+	protected void void_object(ConvertArguments<Void, Object> arguments) {
+		if (DEBUGGING) {
+			Objects.requireNonNull(arguments, "arguments");
+		}
+
 		arguments.output = null;
 	}
 }
