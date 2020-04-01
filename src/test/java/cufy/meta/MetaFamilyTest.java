@@ -12,7 +12,6 @@ package cufy.meta;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,14 +20,14 @@ import java.util.Map;
 @SuppressWarnings("JavaDoc")
 public class MetaFamilyTest {
 	@Test(timeout = 50)
-	public void in_out_subin_subout() {
-		MetaFamily type = this.newRange(
-				new Class[]{Map.class}, //in
-				new Class[]{HashMap.class}, //out
-				new Class[]{List.class}, //subin
-				new Class[]{CharSequence.class}, //subout
-				new Class[]{}//value
-		);
+	@MetaFamily(
+			in = Map.class,
+			out = HashMap.class,
+			subin = List.class,
+			subout = CharSequence.class
+	)
+	public void in_out_subin_subout() throws NoSuchMethodException {
+		MetaFamily type = this.getClass().getMethod("in_out_subin_subout").getAnnotation(MetaFamily.class);
 
 		//in
 		Assert.assertTrue("Map is absolute included", MetaFamily.util.test(type, Map.class));
@@ -46,39 +45,5 @@ public class MetaFamilyTest {
 	@Test
 	public void test() {
 		//TODO
-	}
-
-	private MetaFamily newRange(Class<?>[] in, Class<?>[] out, Class<?>[] subin, Class<?>[] subout, Class<?>[] value) {
-		return new MetaFamily() {
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return null;
-			}
-
-			@Override
-			public Class<?>[] in() {
-				return in == null ? new Class[0] : in;
-			}
-
-			@Override
-			public Class<?>[] out() {
-				return out == null ? new Class[0] : out;
-			}
-
-			@Override
-			public Class<?>[] subin() {
-				return subin == null ? new Class[0] : subin;
-			}
-
-			@Override
-			public Class<?>[] subout() {
-				return subout == null ? new Class[0] : subout;
-			}
-
-			@Override
-			public Class<?>[] value() {
-				return value == null ? new Class[0] : value;
-			}
-		};
 	}
 }
