@@ -12,6 +12,7 @@ package cufy.text;
 import cufy.lang.Clazz;
 
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * A class that can classify sequences from a reader. With just a simple gate method (for the caller).
@@ -21,6 +22,35 @@ import java.io.IOException;
  * @since 31-Mar-2020
  */
 public interface Classifier {
+	/**
+	 * Return the proper clazz for the text in the given 'input'.
+	 *
+	 * @param input  the input to read from
+	 * @param output the initial output instance
+	 * @param <O>    the component-type of the clazz returned
+	 * @return the proper clazz for the text in the given reader
+	 * @throws NullPointerException if the given 'input' is null
+	 * @throws IOException          if any I/O exception occurs
+	 * @throws ClassifyException    if any classifying exception occurs
+	 */
+	default <O> Clazz<O> classify(Reader input, Clazz output) throws IOException {
+		return this.classify(new ClassifyArguments<>(input, output));
+	}
+
+	/**
+	 * Return the proper clazz for the text in the given 'input'.
+	 *
+	 * @param input the input to read from
+	 * @param <O>   the component-type of the clazz returned
+	 * @return the proper clazz for the text in the given reader
+	 * @throws NullPointerException if the given 'input' is null
+	 * @throws IOException          if any I/O exception occurs
+	 * @throws ClassifyException    if any classifying exception occurs
+	 */
+	default <O> Clazz<O> classify(Reader input) throws IOException {
+		return this.classify(new ClassifyArguments<>(input));
+	}
+
 	/**
 	 * Set the {@link ClassifyArguments#output} on the given arguments to the proper clazz for the text in the {@link ClassifyArguments#input}.
 	 *
