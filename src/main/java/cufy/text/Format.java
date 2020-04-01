@@ -35,7 +35,7 @@ public interface Format extends Formatter, Parser, Classifier {
 	 * @throws ParseException       if any parsing exception occurs
 	 */
 	default <O> O cparse(Reader input, O output, Clazz outputClazz) throws IOException {
-		return this.parse(new ParseArguments<>(input, output, this.classify(new ClassifyArguments(input)), outputClazz));
+		return this.parse(input, output, this.classify(input), outputClazz);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public interface Format extends Formatter, Parser, Classifier {
 	 * @throws ParseException       if any parsing exception occurs
 	 */
 	default <O> O cparse(Reader input, O output) throws IOException {
-		return this.parse(new ParseArguments<>(input, output, this.classify(new ClassifyArguments(input))));
+		return this.parse(input, output, this.classify(input));
 	}
 
 	/**
@@ -65,7 +65,7 @@ public interface Format extends Formatter, Parser, Classifier {
 	 * @throws ParseException       if any parsing exception occurs
 	 */
 	default <O> O cparse(Reader input, Clazz outputClazz) throws IOException {
-		return this.parse(new ParseArguments<>(input, this.classify(new ClassifyArguments(input)), outputClazz));
+		return this.parse(input, this.classify(input), outputClazz);
 	}
 
 	/**
@@ -79,6 +79,6 @@ public interface Format extends Formatter, Parser, Classifier {
 	 * @throws ParseException       if any parsing exception occurs
 	 */
 	default <O> O cparse(Reader input) throws IOException {
-		return this.parse(new ParseArguments<>(input, this.classify(new ClassifyArguments(input))));
+		return this.parse(input, this.classify(input));
 	}
 }
