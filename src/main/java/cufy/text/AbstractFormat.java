@@ -154,7 +154,7 @@ public abstract class AbstractFormat implements Format {
 			Objects.requireNonNull(arguments, "arguments");
 		}
 
-		throw new ClassifyException("Can't classify " + arguments.input.getClass());
+		throw new ClassifyException("Can't classify " + arguments.input);
 	}
 
 	/**
