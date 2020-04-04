@@ -113,7 +113,13 @@ public abstract class AbstractConverter implements Converter {
 			Objects.requireNonNull(arguments, "arguments");
 		}
 
-		throw new ConvertException("Cannot convert " + arguments.inputClazz.getFamily() + " to " + arguments.outputClazz.getFamily());
+		if (arguments.input == null) {
+			arguments.output = null;
+		} else if (arguments.outputClazz.getKlass().isInstance(arguments.input)) {
+			arguments.output = arguments.input;
+		} else {
+			throw new ConvertException("Cannot convert " + arguments.inputClazz.getFamily() + " to " + arguments.outputClazz.getFamily());
+		}
 	}
 
 	/**

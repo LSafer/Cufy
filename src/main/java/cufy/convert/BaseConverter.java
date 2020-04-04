@@ -69,7 +69,6 @@ import java.util.*;
  *             <li>{@link #object_string}</li>=
  *             <li>{@link #recurse_object}</li>
  *             <li>{@link #string_object}</li>
- *             <li>{@link #void_object}</li>
  *         </ul>
  *     </li>
  *     <li>
@@ -890,29 +889,5 @@ public class BaseConverter extends AbstractConverter {
 				throw new IllegalArgumentException(arguments.outputClazz.getKlass() + " don't 'valueOf(String)' nor constructor(String) method");
 			}
 		}
-	}
-
-	/**
-	 * Void => Object
-	 * <br/>
-	 * Set the given {@link ConvertArguments} to null.
-	 *
-	 * @param arguments the conversion instance that holds the variables of this conversion
-	 * @throws NullPointerException if the given 'arguments' is null
-	 */
-	@ConvertMethod(
-			input = @MetaFamily(
-					in = Void.class
-			),
-			output = @MetaFamily(
-					subin = Object.class,
-					out = String.class
-			))
-	protected void void_object(ConvertArguments<Void, Object> arguments) {
-		if (DEBUGGING) {
-			Objects.requireNonNull(arguments, "arguments");
-		}
-
-		arguments.output = null;
 	}
 }
