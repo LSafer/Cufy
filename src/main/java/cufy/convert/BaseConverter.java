@@ -502,28 +502,21 @@ public class BaseConverter extends AbstractConverter {
 				throw new IllegalArgumentException(arguments.outputClazz.getKlass() + " is not a class for maps");
 		}
 
-		int length = arguments.input.size();
-
 		if (!arguments.outputClazz.getKlass().isInstance(arguments.output))
 			arguments.output = arguments.outputClazz.getKlass().getConstructor().newInstance();
 
 		arguments.output.keySet().retainAll(arguments.input.keySet());
 
-		Iterator<Map.Entry> it = arguments.input.entrySet().iterator();
-		for (int i = 0; i < length; i++) {
-			Map.Entry inputEntry = it.next();
+		for (Map.Entry inputEntry : (Set<Map.Entry>) arguments.input.entrySet()) {
 			Object key = inputEntry.getKey();
 
 			Object inputElement = inputEntry.getValue();
 			Object outputElement = arguments.output.get(key);
 
-			//DyNaMiC cOnVeRsIoN _/-\_/-\_/- :0 ~ MA-GI-KKU
-			this.convert(new ConvertArguments<>(arguments, inputElement, outputElement, 1));
+			outputElement = this.convert(new ConvertArguments<>(arguments, inputElement, outputElement, 1));
 
 			arguments.output.put(key, outputElement);
 		}
-
-		//TODO key conversion ~ maybe
 	}
 
 	/**
