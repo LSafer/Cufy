@@ -1,2 +1,5 @@
-# base
-The main dependency for all Cufy Java Repositories.
+# Base [![](https://jitpack.io/v/cufyorg/base.svg)](https://jitpack.io/#cufyorg/base)
+### The main dependency for all Cufy Java Repositories.
+- Base concepts with powerful features
+- Dynamic inheritable classes
+- Meta environment support

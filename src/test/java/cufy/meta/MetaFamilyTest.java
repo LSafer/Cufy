@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2019, LSafer, All rights reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * -You can edit this file (except the header).
- * -If you have change anything in this file. You
- *   shall mention that this file has been edited.
- *   By adding a new header (at the bottom of this header)
- *   with the word "Editor" on top of it.
- */
 package cufy.meta;
 
 import org.junit.Assert;
@@ -26,8 +17,8 @@ public class MetaFamilyTest {
 			subin = List.class,
 			subout = CharSequence.class
 	)
-	public void in_out_subin_subout() throws NoSuchMethodException {
-		MetaFamily type = this.getClass().getMethod("in_out_subin_subout").getAnnotation(MetaFamily.class);
+	public void test() throws NoSuchMethodException {
+		MetaFamily type = this.getClass().getMethod("test").getAnnotation(MetaFamily.class);
 
 		//in
 		Assert.assertTrue("Map is absolute included", MetaFamily.util.test(type, Map.class));
@@ -40,10 +31,5 @@ public class MetaFamilyTest {
 		//subout
 		Assert.assertFalse("CharSequence is absolute excluded", MetaFamily.util.test(type, CharSequence.class));
 		Assert.assertFalse("String is sub excluded", MetaFamily.util.test(type, String.class));
-	}
-
-	@Test
-	public void test() {
-		//TODO
 	}
 }
